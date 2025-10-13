@@ -1,14 +1,15 @@
 .dashboard-layout {
   display: flex;
-  height: 100vh;
+  height: auto;
   background-color: var(--grey-tenue);
   padding: 20px;
+  overflow: hidden;
 }
 
 .dashboard-main {
   flex: 1;
   padding: 30px;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .section-title{
@@ -22,12 +23,18 @@
 .quick-actions{
   margin-top: 8rem;
   margin-left: 130px;
-  margin-right: 80px;
+  margin-right: 50px;
   font-family: 'Roboto', sans-serif;
+}
+.quick-actions span{
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  color: var(--black-four);
 }
 .qa-grid{
   display: grid;
-  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  height: auto;
   gap: 20px;
   margin-top: 20px;
 }
@@ -57,7 +64,7 @@
 .panels-grid{
   margin-top: 25px;
   margin-left: 130px;
-  margin-right: 80px;
+  margin-right: 50px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;

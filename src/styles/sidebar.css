@@ -1,6 +1,7 @@
 
 .sidebar-container {
     display: flex;
+    z-index: 9999;
 }
 
 

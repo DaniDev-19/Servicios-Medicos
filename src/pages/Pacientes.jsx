@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import "../styles/pacientes.css";
+import '../styles/pacientes.css';
 import Card from "../components/Card";
-import InfoCard from "../components/InfoCard";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 
@@ -23,57 +22,53 @@ function Pacientes() {
   const estadoBadge = (estado) =>
     estado === "activo" ? "badge badge--success" : "badge badge--muted";
 
+  // columns con accessor/header; render solo donde hace falta
   const columns = [
-    { key: "id", label: "ID" },
-    { key: "cedula", label: "Cédula" },
-    { key: "nombre", label: "Nombre" },
-    { key: "apellido", label: "Apellido" },
-    { key: "sexo", label: "Sexo" },
-    { key: "edad", label: "Edad" },
-    { key: "telefono", label: "Teléfono" },
-    { key: "estado", label: "Estado", render: (v) => <span className={estadoBadge(v)}>{v}</span> },
-    { key: "fechaIngreso", label: "Ingreso" },
-    {
-      key: "acciones",
-      label: "Acciones",
-      render: () => (
+    { accessor: "id", header: "ID", width: 60 },
+    { accessor: "cedula", header: "Cédula" },
+    { accessor: "nombre", header: "Nombre" },
+    { accessor: "apellido", header: "Apellido" },
+    { accessor: "sexo", header: "Sexo" },
+    { accessor: "edad", header: "Edad" },
+    { accessor: "telefono", header: "Teléfono" },
+    { accessor: "estado", header: "Estado", render: (v) => <span className={estadoBadge(v)}>{v}</span> },
+    { accessor: "fechaIngreso", header: "Ingreso" },
+    { header: "Acciones", render: () => (
         <div className="row-actions">
-          <button className="btn btn-xs">Ver</button>
-          <button className="btn btn-xs btn-warn">Editar</button>
-          <button className="btn btn-xs btn-outline">Imprimir</button>
+          <button className="btn btn-xs" title="Ver">Ver</button>
+          <button className="btn btn-xs btn-warn" title="Editar">Editar</button>
+          <button className="btn btn-xs btn-outline" title="Imprimir">Imprimir</button>
         </div>
-      ),
+      )
     },
   ];
 
   return (
     <div className="pac-page">
-      {/* Métricas */}
       <section className="card-container">
-        <Card color="#0033A0">
+        <Card color="#0033A0" title="Total de Pacientes Registrados">
           <img src={icon.user3} alt="" className="icon-card" />
           <span className="number">{stats.total}</span>
-          <h3>Total Pacientes</h3>
+          <h3>Total • Pacientes</h3>
         </Card>
-        <Card color="#0B3A6A">
-          <img src={icon.user2} alt="" className="icon-card" />
+        <Card color="#0B3A6A" title="Total de Pacientes Saludables">
+          <img src={icon.escudobien} alt="" className="icon-card" />
           <span className="number">{stats.activos}</span>
-          <h3>Activos</h3>
+          <h3>Total • Saludables</h3>
         </Card>
-        <Card color="#CE1126">
-          <img src={icon.caratriste} alt="" className="icon-card" />
+        <Card color="#CE1126" title="Total de Pacientes de Reposo">
+          <img src={icon.mascarilla} alt="" className="icon-card" />
           <span className="number">{stats.inactivos}</span>
-          <h3>Inactivos</h3>
+          <h3>Total • Reposo</h3>
         </Card>
-        <Card color="#FCD116">
-          <img src={icon.user} alt="" className="icon-card" />
+        <Card color="#FCD116" title="Total de Pacientes Atendidos en el Día">
+          <img src={icon.user5} alt="" className="icon-card" />
           <span className="number">{stats.nuevosMes}</span>
-          <h3>Nuevos (mes)</h3>
+          <h3>Atendidos (Día)</h3>
         </Card>
       </section>
 
-      {/* Barra de acciones (vista) */}
-      <InfoCard>
+      <section className="quick-actions2">
         <div className="pac-toolbar">
           <div className="filters">
             <div className="field">
@@ -112,24 +107,14 @@ function Pacientes() {
               <img src={icon.impresora} className="btn-icon" alt="" /> Exportar CSV
             </button>
             <button className="btn btn-primary">
-              <img src={icon['user plus']} className="btn-icon" alt="" /> Nuevo paciente
+              <img src={icon.user3} className="btn-icon" alt="" /> Nuevo paciente
             </button>
           </div>
         </div>
-      </InfoCard>
+      </section>
 
-      {/* Tabla */}
       <div className="table-wrap">
-        <Tablas
-          columns={columns}
-          data={MOCK}
-          loading={false}
-          emptyText="Sin pacientes"
-          page={1}
-          pageSize={10}
-          total={MOCK.length}
-          onPageChange={() => {}}
-        />
+        <Tablas columns={columns} data={MOCK} rowsPerPage={5} />
       </div>
     </div>
   );

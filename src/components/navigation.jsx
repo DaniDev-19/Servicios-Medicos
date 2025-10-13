@@ -1,13 +1,19 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/navigate.css';
 import icon from '../components/icon';
 
 function Header() {
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const salida = () => {
+      navigate('/')
+    } 
 
     const routeToTitle = {
         '/admin' : 'Servicios Médicos',
         '/admin/Consultas' : 'Consultas',
+        '/admin/Pacientes' : 'Pacientes',
     };
 
     const Pantalla = routeToTitle[location.pathname || 'Cuidarte Yutong'];
@@ -27,7 +33,7 @@ function Header() {
               <img src={icon.user} alt="User" className='icon' title='Settings user' />
             </button>
             <button className='btn-icon'>
-              <img src={icon.camionsito} alt="Camionsito" className='icon' title='Salida' />
+              <img src={icon.bus2} alt="Camionsito" className='icon' title='Cerrar Sesión' onClick={salida} />
             </button>
           </div>
 

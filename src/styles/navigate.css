@@ -18,8 +18,14 @@
 }
 
 .bienvenida h1 {
-  font-family: 'pacifico', sans-serif;
+  font-family: 'Pacifico', sans-serif;
   color: var(--rojo-principal);
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.bienvenida h1:hover{
+  transform: translateY(-5px);
 }
 
 .navigate-options{

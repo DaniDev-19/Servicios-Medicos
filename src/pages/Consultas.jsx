@@ -16,8 +16,8 @@ function toISODate(d = new Date()) {
 function Consultas() {
   const navigate = useNavigate();
 
-  // Mock (cámbialo por fetch a tu backend)
-  const [data, setData] = useState([
+  // Mock (si no vas a mutarlo, omite el setter para evitar warning)
+  const [data] = useState([
     { id: 101, paciente: "Juan Pérez", doctor: "Dra. López", fecha: "2025-10-06", estado: "pendiente", finalidad: "Medicina General" },
     { id: 102, paciente: "María Gómez", doctor: "Dr. Salas", fecha: "2025-10-07", estado: "finalizada", finalidad: "Odontología" },
     { id: 103, paciente: "Pedro Ruiz", doctor: "Dra. López", fecha: "2025-10-07", estado: "en_proceso", finalidad: "Enfermería" },
@@ -31,11 +31,7 @@ function Consultas() {
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
 
-  // Paginación
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-
-  // Carga desde API (deja listo para conectar)
+  // Carga desde API (plantilla)
   useEffect(() => {
     // setLoading(true);
     // fetch(`${import.meta.env.VITE_API_URL}/consulta`)
@@ -58,18 +54,11 @@ function Consultas() {
           (r.finalidad || "").toLowerCase().includes(s)
       );
     }
-    if (estado !== "todos") {
-      arr = arr.filter((r) => r.estado === estado);
-    }
+    if (estado !== "todos") arr = arr.filter((r) => r.estado === estado);
     if (desde) arr = arr.filter((r) => r.fecha >= desde);
     if (hasta) arr = arr.filter((r) => r.fecha <= hasta);
     return arr.sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
   }, [data, q, estado, desde, hasta]);
-
-  useEffect(() => setPage(1), [q, estado, desde, hasta]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   // Métricas
   const stats = useMemo(() => {
@@ -88,11 +77,15 @@ function Consultas() {
   const exportCSV = () => {
     const headers = ["ID", "Paciente", "Doctor", "Fecha", "Estado", "Finalidad"];
     const rows = filtered.map((r) => [r.id, r.paciente, r.doctor, r.fecha, r.estado, r.finalidad ?? ""]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `consultas_${toISODate()}.csv`; a.click();
+    a.href = url;
+    a.download = `consultas_${toISODate()}.csv`;
+    a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -106,17 +99,17 @@ function Consultas() {
     }
   };
 
-  // Definición de columnas para tu componente Tablas
-  // Si Tablas usa otra API (headers/data o children), dime y lo adapto.
+  // Columnas compatibles con <Tablas/> (accessor/header + render donde aplique)
   const columns = [
-    { key: "id", label: "ID" },
-    { key: "paciente", label: "Paciente" },
-    { key: "doctor", label: "Doctor" },
-    { key: "fecha", label: "Fecha" },
-    { key: "estado", label: "Estado", render: (v) => <span className={estadoClass(v)}>{v.replace("_", " ")}</span> },
-    { key: "finalidad", label: "Finalidad" },
+    { accessor: "id", header: "ID" },
+    { accessor: "paciente", header: "Paciente" },
+    { accessor: "doctor", header: "Doctor" },
+    { accessor: "fecha", header: "Fecha" },
+    { accessor: "estado", header: "Estado", render: (v) => <span className={estadoClass(v)}>{v.replace("_", " ")}</span> },
+    { accessor: "finalidad", header: "Finalidad" },
     {
-      key: "acciones", label: "Acciones", render: (_, row) => (
+      header: "Acciones",
+      render: (_v, row) => (
         <div className="row-actions">
           <button className="btn btn-xs" onClick={() => navigate(`/admin/consulta/${row.id}`)}>Ver</button>
           <button className="btn btn-xs btn-warn" onClick={() => navigate(`/admin/consulta/${row.id}/editar`)}>Editar</button>
@@ -128,7 +121,7 @@ function Consultas() {
 
   return (
     <div className="consultas-page">
-      {/* Métricas principales con tu Card */}
+      {/* Métricas */}
       <section className="card-container">
         <Card color="#0033A0">
           <img src={icon.consulta2} alt="icon-card" className="icon-card" />
@@ -152,7 +145,7 @@ function Consultas() {
         </Card>
       </section>
 
-      {/* Filtros y acciones en InfoCard */}
+      {/* Filtros y acciones */}
       <section className="filters-wrap">
         <InfoCard>
           <div className="consultas-toolbar">
@@ -199,18 +192,9 @@ function Consultas() {
         </InfoCard>
       </section>
 
-      {/* Tabla de consultas con tu componente Tablas */}
+      {/* Tabla de consultas */}
       <div className="table-wrap">
-        <Tablas
-          columns={columns}
-          data={pageData}
-          loading={loading}
-          emptyText="Sin resultados"
-          page={page}
-          pageSize={pageSize}
-          total={filtered.length}
-          onPageChange={setPage}
-        />
+        <Tablas columns={columns} data={filtered} rowsPerPage={10} />
       </div>
     </div>
   );

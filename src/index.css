@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import './styles/responsive.css';
 
 *{
   margin: 0;
@@ -279,6 +280,7 @@ html { scroll-behavior: smooth; }
 .container{
   width: min(1200px, 92%);
   margin-inline: auto;
+  /* margin-top: 5px; */
 }
 
 .landingHeader{
@@ -360,7 +362,7 @@ html { scroll-behavior: smooth; }
 }
 .heroCtas{ display: flex; gap: 12px; margin-bottom: 16px; }
 
-.btn-outline{
+.btn-outlinee{
   display: inline-block;
   padding: 8px 18px;
   border-radius: 999px;
@@ -369,9 +371,11 @@ html { scroll-behavior: smooth; }
   background: transparent;
   text-decoration: none;
   font-weight: 600;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 }
-.btn-outline:hover{
+.btn-outlinee:hover{
   background: rgba(255,255,255,0.15);
+  color: var(--azul-atenuado);
 }
 
 .heroHighlights{
@@ -525,6 +529,7 @@ html { scroll-behavior: smooth; }
   padding: 48px 0;
 }
 .ctaInner h2{ margin-bottom: 8px; }
+.ctaInner p{ margin-bottom: 8px; }
 
 .landingFooter{
   background: var(--black-one);
@@ -541,7 +546,10 @@ html { scroll-behavior: smooth; }
 .footerNav{ display: flex; gap: 14px; }
 .footerNav a{ color: var(--grey-one); text-decoration: none; }
 .footerNav a:hover{ color: var(--white); }
-.footerMail{ color: var(--yellow-principal); text-decoration: none; }
+.footerMail{ 
+  color: var(--yellow-principal); 
+  text-decoration: none; 
+}
 
 .footerBrand{
   display: grid;
@@ -582,12 +590,18 @@ html { scroll-behavior: smooth; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  transition: background .2s ease, transform .12s ease;
+  width: 40px;
+  height: 40px;
+  /* border-radius: 50%; */
+  /* background: rgba(255,255,255,0.12); */
+  /* border: 1px solid rgba(255,255,255,0.2); */
+  transition: padding-bottom 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+  /* box-shadow: 0px 0px 10px #ffffff2f; */
+}
+
+.dev-icon:hover{
+  /* box-shadow: 0px 0px 12px #c1ff44; */
+  padding-bottom: 4px;
 }
 
 /* Reuso y ajustes */

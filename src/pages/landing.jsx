@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import icon from "../components/icon";
 import img from "../components/imagen";
 import Header from "../components/header";
+import '../index.css'
 
 function Landing() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Landing() {
         <section className="hero" id="inicio">
           <div className="container heroInner">
             <div className="heroContent">
-              <h1 className="heroTitle">
+              <h1 className="heroTitle"  title='Apliación --> Sistema de Información para la Gestion Integral de Servicios Médicos --> Planta de Autobuses Yutong Venezuela'>
                 Gestión Integral de Servicios Médicos - Planta Yutong
               </h1>
               <p className="heroSubtitle">
@@ -26,13 +27,13 @@ function Landing() {
                 haz seguimiento a tratamientos en un solo lugar.
               </p>
               <div className="heroCtas">
-                <buttom onClick={irPagina} className="btn-estandar">Entrar al sistema</buttom>
-                <a href="#caracteristicas" className="btn-outline">Conocer más</a>
+                <buttom onClick={irPagina} className="btn-estandar" title='Ve a Iniciar Sesión'>Entrar al sistema</buttom>
+                <a href="#caracteristicas" className="btn-outlinee"  title='Sobre Nosotros'>Conocer más</a>
               </div>
               <ul className="heroHighlights">
-                <li><img src={icon.consulta} alt="" className="iconSm" /> Consultas y seguimiento</li>
-                <li><img src={icon.maletindoctor} alt="" className="iconSm" /> Enfermería y medicamentos</li>
-                <li><img src={icon.impresora} alt="" className="iconSm" /> Reportes y bitácora</li>
+                <li><img src={icon.consulta} alt="" className="iconSm"  title='Consultas' /> Consultas y seguimiento</li>
+                <li><img src={icon.maletindoctor} alt="" className="iconSm"  title='Medicamentos'/> Enfermería y medicamentos</li>
+                <li><img src={icon.impresora} alt="" className="iconSm"  title='Reportes'/> Reportes y bitácora</li>
               </ul>
             </div>
 
@@ -91,23 +92,23 @@ function Landing() {
               <li><span className="tag">Seguimiento</span> Evolución clínica por paciente.</li>
               <li><span className="tag">Notificaciones</span> Recordatorios y alertas internas.</li>
             </ul>
-            <button onClick={irPagina} className="btn-estandar">Comenzar ahora</button>
+            <button onClick={irPagina} className="btn-estandar"  title='Ve a Iniciar Sesión' >Comenzar ahora</button>
           </div>
         </section>
 
         <section className="stats">
           <div className="container statsInner">
             <div className="stat">
-              <span className="statNum">+1K</span>
-              <span className="statLabel">Consultas registradas</span>
+              <span className="statNum">Integridad</span>
+              <span className="statLabel"> • Y Auditoria de Movimientos</span>
             </div>
             <div className="stat">
-              <span className="statNum">24/7</span>
-              <span className="statLabel">Disponibilidad</span>
+              <span className="statNum">La Mejor</span>
+              <span className="statLabel"> • Atención Y Disponibilidad</span>
             </div>
             <div className="stat">
               <span className="statNum">100%</span>
-              <span className="statLabel">Seguridad de acceso</span>
+              <span className="statLabel"> • Seguridad de acceso</span>
             </div>
           </div>
         </section>
@@ -127,7 +128,7 @@ function Landing() {
           <div className="container ctaInner">
             <h2>¿Listo para mejorar la gestión médica?</h2>
             <p>Ingresa al sistema y comienza a registrar de forma profesional.</p>
-            <buttom onClick={irPagina} className="btn-estandar">Ir al Login</buttom>
+            <button onClick={irPagina} className="btn-estandar" title='Ve a Iniciar Sesión'>Ir al Login</button>
           </div>
         </section>
 
@@ -142,19 +143,19 @@ function Landing() {
               {/* Columna central: dev-BadDev (íconos + email con ícono) */}
               <section className="dev-BadDev">
                 <div className="dev-icons">
-                  <a href="#" className="dev-icon" title="Icono 1">
-                    <img src={icon.monitorcardiaco} alt="icono" />
+                  <a href="https://github.com/JDPR19" className="dev-icon" title="GitHub --> BadDev " rel="noopener noreferrer" target="_blank">
+                    <img src={icon.github} alt="icono" className="icon" />
                   </a>
-                  <a href="#" className="dev-icon" title="Icono 2">
-                    <img src={icon.estetoscopio} alt="icono" />
+                  <a href="#" className="dev-icon" title="Telegram --> BadDev">
+                    <img src={icon.telegram} alt="icono" className="icon"/>
                   </a>
-                  <a href="#" className="dev-icon" title="Icono 3">
-                    <img src={icon.maletindoctor2} alt="icono" />
+                  <a href="#" className="dev-icon" title="Pagina --> BadDev">
+                    <img src={icon.cv2} alt="icono" className="icon"/>
                   </a>
                 </div>
 
-                <a href="mailto:baddevprograming@gmail.com" className="dev-mail" title="Correo de contacto">
-                  <img src={icon.link} alt="" className="dev-mailIcon" />
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=baddevprogramming@gmail.com" className="dev-mail" title="Contactame --> Soporte Técnico - Asesorias y Mentorias - Desarrollo de Aplicaciones Web y Mucho Mas --> BadDev --> Una Huella • Un Logo • Una Esencia • Con Total Compromiso y Pasión --> • Seguimos Avanzando en la Construcción de Nuevas Mecánicas que Solventen el por Venir de los Tiempos • Innovando Soluciones • BadDev" target='_blank' rel="noopener noreferrer">
+                  <img src={icon.link} alt="icon-Link" className="dev-mailIcon" />
                   BadDevPrograming@Gmail.com
                 </a>
               </section>
@@ -162,11 +163,14 @@ function Landing() {
               {/* Columna derecha: navegación y correo general */}
               <div className="footerRight">
                 <nav className="footerNav">
-                  <a href="#inicio">Inicio</a>
-                  <a href="#caracteristicas">Características</a>
-                  <a href="#servicios">Servicios</a>
+                  <a href="#inicio"  title='Ir al Inicio'>Inicio</a>
+                  <a href="#caracteristicas"  title='Ir a Caracteristicas'>Características</a>
+                  <a href="#servicios"  title='Ir a Servicios'>Servicios</a>
                 </nav>
-                <a href="mailto:oticyutong@gmail.com" className="footerMail">oticyutong@gmail.com</a>
+                <a hjref="https://mail.google.com/mail/?view=cm&fs=1&to=oticyutong@gmail.com" className="dev-mail" rel="noopener noreferrer" target="_blank"  title='Contactanos Para Soporte Técnico y Mucho mas --> Oficina de Tecnologia de la Información y Comunicación --> OTIC --> Brindado el Apoyo Necesario y Sustentable Para Todas Tus Gestiones'>
+                    <img src={icon.link} alt="icon-Link" className="dev-mailIcon" />
+                    OTICYUTONG@GMAIL.COM
+                </a>
               </div>
           </div>
         </footer>
