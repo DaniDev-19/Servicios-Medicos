@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import '../styles/pacientes.css';
+import '../index.css'
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
@@ -22,7 +22,6 @@ function Pacientes() {
   const estadoBadge = (estado) =>
     estado === "activo" ? "badge badge--success" : "badge badge--muted";
 
-  // columns con accessor/header; render solo donde hace falta
   const columns = [
     { accessor: "id", header: "ID", width: 60 },
     { accessor: "cedula", header: "Cédula" },
@@ -100,14 +99,14 @@ function Pacientes() {
           </div>
 
           <div className="actions">
-            <button className="btn btn-secondary">
+            {/* <button className="btn btn-secondary">
               <img src={icon.candado} className="btn-icon" alt="" /> Refrescar
-            </button>
+            </button> */}
             <button className="btn btn-outline">
-              <img src={icon.impresora} className="btn-icon" alt="" /> Exportar CSV
+              <img src={icon.impresora} className="btn-icon" alt="" /> Exportar
             </button>
             <button className="btn btn-primary">
-              <img src={icon.user3} className="btn-icon" alt="" /> Nuevo paciente
+              <img src={icon.user5} className="btn-icon" alt="" /> Nuevo paciente
             </button>
           </div>
         </div>

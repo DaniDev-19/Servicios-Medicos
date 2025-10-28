@@ -7,6 +7,7 @@ import Login from "./pages/Login.jsx";
 import DaskBoard from './pages/DaskBoard.jsx';
 import Consultas from './pages/Consultas.jsx';
 import Pacientes from './pages/Pacientes.jsx';
+import Seguimiento from './pages/SeguimientoPaciente.jsx';
 
 ////////////////////////// PANTALLAS FORMULARIOS ////////////////
 import ForConsultas from './Formularios/ForConsultas'; 
@@ -46,10 +47,11 @@ function App() {
               <Route path='Consultas' element={<Consultas/>} />
               <Route path='ForConsultas' element={<ForConsultas/>} />
               <Route path='Pacientes' element={<Pacientes/>} />
+              <Route path='Seguimiento' element={<Seguimiento/>} />
 
             </Route>
 
-          {/* RUTA PARA ERRPR 404 */}
+          {/* RUTA PARA ERROR 404 */}
           <Route path="*" element={<h1> Página no encontrada -- Error 404 -- </h1>} />
           
       </Routes>   

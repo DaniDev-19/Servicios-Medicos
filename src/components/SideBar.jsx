@@ -5,7 +5,7 @@ import icon from '../components/icon';
 import img from '../components/imagen';
 
 function Sidebar() {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);

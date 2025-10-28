@@ -7,13 +7,15 @@ function Header() {
     const navigate = useNavigate();
 
     const salida = () => {
-      navigate('/')
+      navigate('/Login')
     } 
 
     const routeToTitle = {
         '/admin' : 'Servicios Médicos',
         '/admin/Consultas' : 'Consultas',
+        '/admin/ForConsultas' : 'Nueva Consulta',
         '/admin/Pacientes' : 'Pacientes',
+        '/admin/Seguimiento' : ` Paciente Juan Perez`,
     };
 
     const Pantalla = routeToTitle[location.pathname || 'Cuidarte Yutong'];

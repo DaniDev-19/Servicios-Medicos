@@ -1,4 +1,4 @@
-import '../styles/daskboard.css';
+
 import '../index.css';
 import Card from '../components/Card';
 import icon from '../components/icon';
@@ -53,11 +53,11 @@ function DashboardPage() {
               <img src={icon.user4} alt="pacientes" className="icon" />
               <span>Registrar Paciente</span>
             </button>
-            <button className="qa-card" onClick={() => navigate('/admin/medicamentos/cargar')} title='Cargar un Medicamento al inventario'>
+            <button className="qa-card" onClick={() => navigate('/admin/medicamentos/cargar')} title='Crear Historial Médico'>
               <img src={icon.cv3} alt="medicamentos" className="icon" />
               <span>Nueva Historia Médica</span>
             </button>
-            <button className="qa-card" onClick={() => navigate('/admin/consulta/nueva')} title='Diagnosticar un Paciente'>
+            <button className="qa-card" onClick={() => navigate('/admin/ForConsultas')} title='Diagnosticar un Paciente'>
               <img src={icon.estetoscopio2} alt="consultas" className="icon" />
               <span>Nueva Consulta</span>
             </button>

@@ -1,0 +1,185 @@
+.tabsGeneralContainer {
+    width: 100%;
+    margin-bottom: -110px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabsContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 25px;
+    max-width: 900px;
+    width: max-content;
+    gap: 5px;
+    border-radius: 10px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--light-green) #e9ecef;
+}
+
+.tabsContainer::-webkit-scrollbar {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 8px;
+}
+.tabsContainer::-webkit-scrollbar-thumb {
+    background: var(--light-green);
+    border-radius: 8px;
+}
+.tabsContainer::-webkit-scrollbar-thumb:hover {
+    background: var(--green-hover1);
+}
+.tabsContainer::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+.tabsTitle {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: var(--black);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.tabButton {
+    flex-shrink: 0;
+    background: #bddaaf31;
+    color: #4444448e;
+    border: 1.5px solid #98c79a;
+    border-radius: 30px;
+    padding: 6px 18px;
+    font-size: 1em;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    margin-bottom: 2px;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    outline: none;
+}
+
+.tabButton.active,
+.tabButton:hover {
+    background: #b5dba3c7;
+    color: #444444;
+    border: 1.5px solid #99cc5e;
+    box-shadow: 0 2px 8px #98c79a3a;
+}
+
+/* Tabs del menú de notificaciones */
+.tabsNoti {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--grey2);
+
+}
+
+.tabButtonNoti {
+    flex-shrink: 0;
+    background: #bddaaf31;
+    color: #4444448e;
+    border: 1.5px solid #98c79a;
+    border-radius: 30px;
+    padding: 5px 10px;
+    font-size: 0.80em;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    margin-bottom: 10px;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    outline: none;
+}
+
+.tabButtonNoti.active,
+.tabButtonNoti:hover {
+    background: #b5dba3c7;
+    color: #444444;
+    border: 1.5px solid #99cc5e;
+    box-shadow: 0 2px 8px #98c79a3a;
+}
+
+.toggleTabsButton{
+    margin-bottom: 10px;
+    background: var(--grey);
+    color: var(--black2);
+    border: none;
+    border-radius: 6px;
+    opacity: 0.7;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    align-self: flex;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.toggleTabsButton:hover {
+    opacity: 1;
+}
+
+.tabsContent {
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    max-height: 1000px; /* suficiente para el contenido */
+    opacity: 1;
+}
+
+.tabsContentHidden {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+:global(.dark) .tabsContainer {
+    background: var(--table-header-bg);
+    border-bottom: 1px solid var(--grey4);
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.6);
+}
+
+:global(.dark) .tabsTitle {
+    color: #fff;
+}
+
+:global(.dark) .tabButton {
+    background: var(--grey2);
+    color: #fff;
+    border: 1.5px solid var(--grey4);
+}
+
+:global(.dark) .tabButton.active,
+:global(.dark) .tabButton:hover {
+    background: var(--grey3);
+    color: #fff;
+    border: 1.5px solid var(--grey5);
+    box-shadow: 0 2px 8px var(--grey4);
+}
+
+/* Tabs del menú de notificaciones */
+:global(.dark) .tabsNoti {
+    border-bottom: 1px solid var(--grey4);
+}
+
+:global(.dark) .tabButtonNoti {
+    background: var(--grey2);
+    color: #fff;
+    border: 1.5px solid var(--grey4);
+}
+
+:global(.dark) .tabButtonNoti.active,
+:global(.dark) .tabButtonNoti:hover {
+    background: var(--grey3);
+    color: #fff;
+    border: 1.5px solid var(--grey5);
+    box-shadow: 0 2px 8px var(--grey4);
+}

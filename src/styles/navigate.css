@@ -61,11 +61,11 @@
   color: var(--azul-texto);
   font-family: 'Roboto', sans-serif;
   background: var(--grey-opaco);
-  margin-top: 20px;
+  margin-top: 2px;
   border-radius: 10px;
   padding: 20px;
   position: absolute;
-  top: 125px;
+  top: 115px;
 }
 
 .apartado h1 {
