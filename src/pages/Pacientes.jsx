@@ -3,44 +3,115 @@ import '../index.css'
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
-
+import { useNavigate } from "react-router-dom";
+// Datos estáticos de ejemplo, reflejando los campos de la tabla SQL
 const MOCK = [
-  { id: 1, cedula: "V-12345678", nombre: "Juan", apellido: "Pérez", sexo: "M", edad: 32, telefono: "0412-1234567", estado: "activo", fechaIngreso: "2025-09-15" },
-  { id: 2, cedula: "V-87654321", nombre: "María", apellido: "Gómez", sexo: "F", edad: 28, telefono: "0414-7654321", estado: "activo", fechaIngreso: "2025-10-01" },
-  { id: 3, cedula: "E-22334455", nombre: "Pedro", apellido: "Ruiz", sexo: "M", edad: 45, telefono: "0424-1112233", estado: "inactivo", fechaIngreso: "2025-08-21" },
+  {
+    id: 1,
+    cedula: "V-12345678",
+    nombre: "Juan",
+    apellido: "Pérez",
+    sexo: "M",
+    fecha_nacimiento: "1990-05-12",
+    edad: "34",
+    correo: "juan.perez@yutong.com",
+    contacto: "0412-1234567",
+    codigo_territorial: "E01-M01-P01-S01",
+    ubicacion: "Galpón 2",
+    estado: "activo",
+    estado_id: 1,
+    municipio_id: 1,
+    parroquia_id: 1,
+    sector_id: 1,
+    departamentos_id: 2,
+    cargos_id: 3,
+    profesion_id: 4,
+  },
+  {
+    id: 2,
+    cedula: "V-87654321",
+    nombre: "María",
+    apellido: "Gómez",
+    sexo: "F",
+    fecha_nacimiento: "1985-11-23",
+    edad: "39",
+    correo: "maria.gomez@yutong.com",
+    contacto: "0414-7654321",
+    codigo_territorial: "E01-M02-P03-S02",
+    ubicacion: "Oficina Principal",
+    estado: "activo",
+    estado_id: 1,
+    municipio_id: 2,
+    parroquia_id: 3,
+    sector_id: 2,
+    departamentos_id: 1,
+    cargos_id: 2,
+    profesion_id: 3,
+  },
+  {
+    id: 3,
+    cedula: "E-22334455",
+    nombre: "Pedro",
+    apellido: "Ruiz",
+    sexo: "M",
+    fecha_nacimiento: "1978-02-10",
+    edad: "46",
+    correo: "pedro.ruiz@yutong.com",
+    contacto: "0424-1112233",
+    codigo_territorial: "E02-M03-P02-S03",
+    ubicacion: "Almacén",
+    estado: "activo",
+    estado_id: 2,
+    municipio_id: 3,
+    parroquia_id: 2,
+    sector_id: 3,
+    departamentos_id: 3,
+    cargos_id: 1,
+    profesion_id: 2,
+  },
 ];
 
+
 function Pacientes() {
-  const stats = useMemo(() => {
-    const total = MOCK.length;
-    const activos = MOCK.filter(p => p.estado === "activo").length;
-    const inactivos = MOCK.filter(p => p.estado === "inactivo").length;
-    const nuevosMes = MOCK.filter(p => (p.fechaIngreso || "").startsWith("2025-10")).length;
-    return { total, activos, inactivos, nuevosMes };
-  }, []);
+    const navigate = useNavigate();
+    const stats = useMemo(() => {
+      const total = MOCK.length;
+      const activos = MOCK.filter(p => p.estado === "activo").length;
+      const inactivos = MOCK.filter(p => p.estado === "inactivo").length;
+      const nuevosMes = MOCK.filter(p => (p.fechaIngreso || "").startsWith("2025-10")).length;
+      return { total, activos, inactivos, nuevosMes };
+    }, []);
 
   const estadoBadge = (estado) =>
     estado === "activo" ? "badge badge--success" : "badge badge--muted";
 
   const columns = [
-    { accessor: "id", header: "ID", width: 60 },
+   { accessor: "id", header: "ID", width: 50 },
     { accessor: "cedula", header: "Cédula" },
     { accessor: "nombre", header: "Nombre" },
     { accessor: "apellido", header: "Apellido" },
-    { accessor: "sexo", header: "Sexo" },
-    { accessor: "edad", header: "Edad" },
-    { accessor: "telefono", header: "Teléfono" },
+    { accessor: "sexo", header: "Sexo", width: 60 },
+    { accessor: "fecha_nacimiento", header: "F. Nacimiento" },
+    { accessor: "edad", header: "Edad", width: 60 },
+    // { accessor: "correo", header: "Correo" },
+    { accessor: "contacto", header: "Contacto" },
+    // { accessor: "fechaIngreso", header: "Ingreso" },
     { accessor: "estado", header: "Estado", render: (v) => <span className={estadoBadge(v)}>{v}</span> },
-    { accessor: "fechaIngreso", header: "Ingreso" },
     { header: "Acciones", render: () => (
         <div className="row-actions">
           <button className="btn btn-xs" title="Ver">Ver</button>
           <button className="btn btn-xs btn-warn" title="Editar">Editar</button>
           <button className="btn btn-xs btn-outline" title="Imprimir">Imprimir</button>
+          <button className="btn btn-xs btn-outline btn-danger" title="Eliminar">Eliminar</button>
         </div>
       )
     },
   ];
+
+  const handleFormulario = () =>{
+    console.log('handle pulsado');
+    navigate('/admin/ForPacientes');
+  };
 
   return (
     <div className="pac-page">
@@ -105,8 +176,8 @@ function Pacientes() {
             <button className="btn btn-outline">
               <img src={icon.impresora} className="btn-icon" alt="" /> Exportar
             </button>
-            <button className="btn btn-primary">
-              <img src={icon.user5} className="btn-icon" alt="" /> Nuevo paciente
+            <button className="btn btn-primary" onClick={handleFormulario}>
+              <img src={icon.user5} className="btn-icon" alt=""  /> Nuevo paciente
             </button>
           </div>
         </div>

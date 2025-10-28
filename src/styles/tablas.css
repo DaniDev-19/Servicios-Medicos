@@ -42,10 +42,15 @@
 
 .custom-table th, 
 .custom-table td {
-    padding: 12px 16px;
+    padding: 15px 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
     cursor: pointer;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: auto;
+    flex-wrap: wrap;
 }
 
 .custom-table th.active-sort {

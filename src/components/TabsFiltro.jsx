@@ -1,5 +1,5 @@
 // import React, { useState} from 'react';
-import styles from './tabsFiltro.module.css';
+import styles from '../styles/tabsFiltro.module.css';
 
 function TabsFiltro({ tabs, activeTab, onTabClick, /*showTitle = true */}) {
     // const [visible, setVisible] = useState(false);

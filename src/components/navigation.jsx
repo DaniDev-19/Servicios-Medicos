@@ -14,8 +14,13 @@ function Header() {
         '/admin' : 'Servicios Médicos',
         '/admin/Consultas' : 'Consultas',
         '/admin/ForConsultas' : 'Nueva Consulta',
+        '/admin/ForPacientes' : ` Nuevo Paciente`,
         '/admin/Pacientes' : 'Pacientes',
         '/admin/Seguimiento' : ` Paciente Juan Perez`,
+        '/admin/Historias' : 'Historias',
+        '/admin/ForHistorias' : 'Nueva Historia',
+        '/admin/Reposos' : 'Reposos',
+        '/admin/ForReposos' : 'Nuevo Reposo',
     };
 
     const Pantalla = routeToTitle[location.pathname || 'Cuidarte Yutong'];

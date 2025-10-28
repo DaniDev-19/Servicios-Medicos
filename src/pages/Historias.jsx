@@ -4,44 +4,62 @@ import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useNavigate } from "react-router-dom";
-import TabsFiltro from "../components/TabsFiltro";
 
+// Datos estáticos de ejemplo, reflejando la tabla SQL historias_medicas y relación con enfermedades
 const MOCK = [
   {
     id: 1,
-    codigo: "CON-001",
-    cedula: "V-12345678",
+    codigo: "PAYV-HM-202510-00001",
+    fecha_consulta: "2025-10-01",
+    fecha_alta: "2025-10-10",
+    motivo_consulta: "Dolor de cabeza persistente",
+    historia: "Paciente refiere cefalea desde hace 3 días...",
+    examen_fisico: "TA 120/80, FC 78, FR 16, Temp 36.8°C",
+    diagnostico: "Migraña",
+    observacion: "Se indica reposo y control en 7 días",
+    fecha_creacion: "2025-10-01 09:00:00",
+    pacientes_id: 1,
     paciente: "Juan Pérez",
-    enfermedad: "Hipertensión",
-    diagnostico: "Presión arterial elevada",
-    tratamientos: "Reposo, dieta baja en sal",
-    observaciones: "Control en 1 semana",
-    fecha_atencion: "2025-09-15",
+    usuarios_id: 2,
+    usuario: "Dra. López",
     estado: true,
+    enfermedades: ["Migraña", "Hipertensión"],
   },
   {
     id: 2,
-    codigo: "CON-002",
-    cedula: "V-87654321",
+    codigo: "PAYV-HM-202510-00002",
+    fecha_consulta: "2025-10-02",
+    fecha_alta: "2025-10-05",
+    motivo_consulta: "Dolor abdominal",
+    historia: "Paciente con dolor abdominal tipo cólico...",
+    examen_fisico: "TA 110/70, FC 80, FR 18, Temp 37.1°C",
+    diagnostico: "Gastritis aguda",
+    observacion: "Se prescribe omeprazol y dieta blanda",
+    fecha_creacion: "2025-10-02 10:30:00",
+    pacientes_id: 2,
     paciente: "María Gómez",
-    enfermedad: "Diabetes",
-    diagnostico: "Glucosa alta",
-    tratamientos: "Metformina, dieta",
-    observaciones: "Revisión mensual",
-    fecha_atencion: "2025-10-01",
+    usuarios_id: 3,
+    usuario: "Dr. Salas",
     estado: true,
+    enfermedades: ["Gastritis"],
   },
   {
     id: 3,
-    codigo: "CON-003",
-    cedula: "E-22334455",
+    codigo: "PAYV-HM-202510-00003",
+    fecha_consulta: "2025-10-03",
+    fecha_alta: "2025-10-08",
+    motivo_consulta: "Fiebre y malestar general",
+    historia: "Paciente refiere fiebre de 38.5°C y malestar...",
+    examen_fisico: "TA 115/75, FC 90, FR 20, Temp 38.5°C",
+    diagnostico: "Cuadro viral",
+    observacion: "Reposo domiciliario y líquidos",
+    fecha_creacion: "2025-10-03 11:15:00",
+    pacientes_id: 3,
     paciente: "Pedro Ruiz",
-    enfermedad: "Gripe",
-    diagnostico: "Cuadro viral leve",
-    tratamientos: "Paracetamol, líquidos",
-    observaciones: "Reposo domiciliario",
-    fecha_atencion: "2025-08-21",
+    usuarios_id: 2,
+    usuario: "Dra. López",
     estado: false,
+    enfermedades: ["Cuadro viral"],
   },
 ];
 
@@ -54,20 +72,22 @@ function Consultas() {
     const nuevosMes = MOCK.filter(p => (p.fechaIngreso || "").startsWith("2025-10")).length;
     return { total, activos, inactivos, nuevosMes };
   }, []);
-;
 
-  // const estadoBadge = (estado) =>
-  //   estado === "activo" ? "badge badge--success" : "badge badge--muted";
 
+  // Columnas reflejando la tabla SQL y relación con enfermedades
   const columns = [
-  // { accessor: "id", header: "ID", width: 60 },
-  { accessor: "codigo", header: "Código" },
-  // { accessor: "fecha_atencion", header: "Fecha Atención" },
-  { accessor: "paciente", header: "Paciente" }, 
-  { accessor: "enfermedad", header: "Enfermedad" },
-  { accessor: "diagnostico", header: "Diagnóstico" },
-  { accessor: "tratamientos", header: "Tratamientos" },
-  { accessor: "observaciones", header: "Observaciones" },
+    // { accessor: "id", header: "ID", width: 50 },
+    { accessor: "codigo", header: "Código" },
+    // { accessor: "fecha_consulta", header: "F. Consulta" },
+    // { accessor: "fecha_alta", header: "F. Alta" },
+    { accessor: "paciente", header: "Paciente" },
+    { accessor: "usuario", header: "Médico" },
+    // { accessor: "motivo_consulta", header: "Motivo" },
+    // { accessor: "historia", header: "Historia" },
+    // { accessor: "examen_fisico", header: "Examen Físico" },
+    { accessor: "diagnostico", header: "Diagnóstico" },
+    { accessor: "observacion", header: "Observación" },
+    { accessor: "enfermedades", header: "Enfermedades", render: (v) => v && v.length ? v.join(", ") : "-" },
   
     { header: "Acciones", render: () => (
         <div className="row-actions">
@@ -83,26 +103,26 @@ function Consultas() {
   return (
     <div className="pac-page">
       <section className="card-container">
-        <Card color="#0033A0" title="Total de Pacientes Registrados">
-          <img src={icon.user3} alt="" className="icon-card" />
+        <Card color="#0033A0" title="Total de Historias">
+          <img src={icon.folder} alt="" className="icon-card" />
           <span className="number">{stats.total}</span>
-          <h3>Total • Pacientes</h3>
+          <h3>Historias • Total</h3>
         </Card>
-        <Card color="#0B3A6A" title="Total de Pacientes Saludables">
+        {/* <Card color="#0B3A6A" title="Historias Activas">
           <img src={icon.escudobien} alt="" className="icon-card" />
-          <span className="number">{stats.activos}</span>
-          <h3>Total • Saludables</h3>
+          <span className="number">{stats.activas}</span>
+          <h3>Historias • Activas</h3>
         </Card>
-        <Card color="#CE1126" title="Total de Pacientes de Reposo">
+        <Card color="#CE1126" title="Historias Inactivas">
           <img src={icon.mascarilla} alt="" className="icon-card" />
-          <span className="number">{stats.inactivos}</span>
-          <h3>Total • Reposo</h3>
+          <span className="number">{stats.inactivas}</span>
+          <h3>Inactivas</h3>
         </Card>
-        <Card color="#FCD116" title="Total de Pacientes Atendidos en el Día">
+        <Card color="#FCD116" title="Historias Mes Actual">
           <img src={icon.user5} alt="" className="icon-card" />
-          <span className="number">{stats.nuevosMes}</span>
-          <h3>Atendidos (Día)</h3>
-        </Card>
+          <span className="number">{stats.mesActual}</span>
+          <h3>Mes Actual</h3>
+        </Card> */}
       </section>
 
       <section className="quick-actions2">
@@ -143,8 +163,8 @@ function Consultas() {
             <button className="btn btn-outline">
               <img src={icon.impresora} className="btn-icon" alt="" /> Exportar
             </button>
-            <button className="btn btn-primary" onClick={() => navigate('/admin/ForConsultas')}>
-              <img src={icon.user5}  className="btn-icon" alt="" /> Nuevo paciente
+            <button className="btn btn-primary" onClick={() => navigate('/admin/ForHistorias')}>
+              <img src={icon.user5} className="btn-icon" alt="" /> Nueva historia
             </button>
           </div>
         </div>

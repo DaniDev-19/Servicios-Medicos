@@ -11,6 +11,8 @@ function Sidebar() {
         setIsOpen(!isOpen);
     };
 
+    const closeSidebar = () => setIsOpen(false);
+
     const links = [
         { to: '/admin', label: 'Home', icon: icon.corazon},
         { to: '/admin/Pacientes', label: 'Pacientes', icon: icon.user3},
@@ -21,6 +23,7 @@ function Sidebar() {
     ];
 
     return (
+        <>
         <div className={`sidebar-container ${isOpen ? 'open' : 'closed'}`}>
             {/* Botón hamburguesa */}
             <button className="toggle-btn" onClick={toggleSidebar}>
@@ -47,6 +50,8 @@ function Sidebar() {
                 </ul>
             </aside>
         </div>
+        {isOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+    </>
     );
 }
 
