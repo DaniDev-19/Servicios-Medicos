@@ -91,13 +91,6 @@
   z-index: 1;
 } 
 
-/* .cartForm.glass{
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.35);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-} */
 
 .title{
   display: inline-flex;
@@ -887,11 +880,7 @@ html { scroll-behavior: smooth; }
 }
 .forc-actions-right{ display: flex; gap: 8px; }
 
-/* .btn{
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; border-radius: 10px; padding: 8px 14px; border: 1px solid transparent;
-  background: var(--grey-tenue); cursor: pointer; font-weight: 700;
-} */
+
 .btn-primary{ background: var(--rojo); color: var(--white); }
 .btn-primary:hover{ background: var(--rojo-principal); }
 .btn-outline{ background: transparent; border-color: var(--azul-two); color: var(--azul-texto); }
@@ -904,7 +893,7 @@ html { scroll-behavior: smooth; }
 
 .pac-page{
   display: grid;
-  gap: 16px;
+  gap: 10px;
   padding: 16px 20px;
   background: var(--grey-tenue);
   border-radius: 8px;
@@ -920,11 +909,9 @@ html { scroll-behavior: smooth; }
 /* Acciones y filtros */
 .quick-actions2{ 
   position: relative;
-  top: 20%;
   margin-left: 50px;
   margin-right: 50px;
-  margin-top: 60px;
-  margin-bottom: 20px;
+  /* margin-bottom: 10px; */
   padding: 20px; 
 }
 .pac-page .pac-toolbar{
@@ -962,17 +949,7 @@ html { scroll-behavior: smooth; }
 .pac-page .field-icon{ width: 18px; height: 18px; opacity: .7; }
 .pac-page .actions{ display: flex; gap: 10px; align-items: center; }
 
-/* Botones (scopeados) */
-/* .pac-page  .btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  border-radius: 10px;
-  padding: 2px 8px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-weight: 700;
-} */
+
  .btn:disabled{ opacity: .6; cursor: not-allowed; }
  .btn-icon{ width: 18px; height: 18px; }
 .btn-primary{ background: var(--rojo); color: var(--white); }
@@ -1146,51 +1123,6 @@ html { scroll-behavior: smooth; }
     padding: 12px;
   }
 }
-/* Tabla: espacio, legibilidad y scroll si desborda */
-/* .pac-page .table-wrap{
-  margin-top: 4px;
-  background: var(--white);
-  border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  overflow: auto;    
-  padding: 8px;
-} */
-
-/* Refuerzo visual para el table que pinta <Tablas/> */
-/* .pac-page .table-wrap table{
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 900px;  
-  background: var(--white);
-  color: var(--black-thre);
-  font-family: 'Roboto', sans-serif;
-  font-size: 0.95rem;
-}
-.pac-page .table-wrap thead th{
-  position: sticky; top: 0;
-  background: #f9fbfc;
-  color: var(--azul-texto);
-  text-align: left;
-  font-weight: 800;
-  z-index: 1;
-}
-.pac-page .table-wrap th,
-.pac-page .table-wrap td{
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  vertical-align: middle;
-} */
-
-/* Badges y acciones por fila */
-/* .pac-page .badge{
-  display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: .85rem;
-  border: 1px solid rgba(0,0,0,0.06); background: #f5f5f5; color: #444;
-}
-.pac-page .badge--success{ background: #eaf7ea; color: #1f6d1f; border-color: #cfe8cf; }
-.pac-page .badge--muted{ background: #f1f1f1; color: #666; }
-
-.pac-page .row-actions{ display: flex; gap: 6px; } */
 
 /* Responsive */
 @media (max-width: 1200px) and (max-height: 850px) {

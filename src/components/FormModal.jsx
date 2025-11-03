@@ -1,32 +1,36 @@
-import BaseModal from './BaseModal';
+import React from "react";
+import styles from "../styles/modal.module.css";
 
-function FormModal({ isOpen, onClose, onSubmit }) {
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const values = Object.fromEntries(formData.entries());
-        onSubmit(values);
-        onClose();
-    };
+function FormModal({
+  isOpen,
+  onClose,
+  title = "",
+  children,
+  animation = "fade",
+  width = "",
+  showClose = true
+}) {
+  if (!isOpen) return null;
 
-    return (
-        <BaseModal isOpen={isOpen} onClose={onClose} title="Formulario" animation="slide-up">
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Nombre:
-                    <input type="text" name="nombre" required />
-                </label>
-                <label>
-                    Email:
-                    <input type="email" name="email" required />
-                </label>
-                <div className="modal-actions">
-                    <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
-                    <button type="submit" className="btn-confirm">Enviar</button>
-                </div>
-            </form>
-        </BaseModal>
-    );
+  return (
+    <div className={styles["modal-overlay"]} onClick={onClose}>
+      <div
+        className={`${styles["modal-content"]} ${styles[animation] || ""}`}
+        style={{ width }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className={styles["modal-header"]}>
+          <h2>{title}</h2>
+          {showClose && (
+            <button className="btn btn-xs btn-outline" onClick={onClose}>
+              ✖
+            </button>
+          )}
+        </div>
+        <div className={styles["modal-body"]}>{children}</div>
+      </div>
+    </div>
+  );
 }
 
 export default FormModal;

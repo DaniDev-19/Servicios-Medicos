@@ -3,19 +3,54 @@ import '../index.css';
 import Card from '../components/Card';
 import icon from '../components/icon';
 import { useNavigate } from 'react-router-dom';
+import { useAlert } from "../components/userAlert";
+import { useToast } from "../components/userToasd";
+import Spinner from '../components/spinner';
+import React, { useState } from 'react';
+import Pogress from '../components/Pogress';
 
 function DashboardPage() {
   const navigate = useNavigate();
-  
+  const showAlert = useAlert();
+  const showToast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [pgVisible, setPgVisible] = useState(false);
+  const progressDuration = 5000;
   const handleCard = () => {
-    alert('pulse una carta');
+    showAlert("Consulta guardada correctamente", "success", 3000);
+    showAlert("hola valentin", "warning", 5000);
+    showAlert("hola valentin", "warning", 5000);
+    showAlert("hola valentin", "info", 5000);
+    showAlert("hola valentin", "error", 5000);
   };
+
+  const handleClick = () => {
+    setPgVisible(true);
+    setTimeout(() => setPgVisible(false), progressDuration);
+  };
+
+  
   
   return (
     <div className='dashboard-layout'>
-
       <main className="dashboard-main">
 
+{/* {loading && (
+  <div className="spinner-overlay">
+    <Spinner size={100} ></Spinner>
+  </div>
+)} */}
+
+{pgVisible && (
+          <div className="spinner-overlay">
+            <Pogress
+              color="var(--azul)"
+              label="YUTONG  LLEVANDO SOLICITUD..."
+              progressDuration={progressDuration}
+              busIcon={icon.bus2}
+            />
+          </div>
+        )}
       <section className='card-container'>
           
           <Card onClick={handleCard} color='#0033A0'  title='Total de Pacientes Registrados'>
@@ -24,14 +59,14 @@ function DashboardPage() {
             <h3>Pacientes Totales</h3>
           </Card>
 
-          <Card color='#CE1126'  title='Total de Historias Medicas Realizadas'>
+          <Card color='#CE1126'  onClick={handleClick} title='Total de Historias Medicas Realizadas'>
             <img src={icon.folder} alt="icon-card" className='icon-card'/>
             <span className='number'>1</span>
             
             <h3>Historias Médicas</h3>
           </Card>
 
-          <Card color='#FCD116'  title='Total de Consultas Realizadas'>
+          <Card color='#FCD116'   title='Total de Consultas Realizadas'>
             <img src={icon.estetoscopio} alt="icon-card" className='icon-card'/>
             <span className='number'>1</span>
             <h3>Consultas Totales</h3>

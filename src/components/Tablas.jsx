@@ -94,8 +94,8 @@ function Table({ columns = [], data = [], rowsPerPage = 5 }) {
                   {columns.map((col, colIndex) => {
                     const value = col.accessor ? row?.[col.accessor] : undefined;
                     const content = typeof col.render === 'function'
-                      ? col.render(value, row)
-                      : value ?? '';
+                    ? col.render(row)
+                    : value ?? '';
                     return <td key={colIndex}>{content}</td>;
                   })}
                 </tr>

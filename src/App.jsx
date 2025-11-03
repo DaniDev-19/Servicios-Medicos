@@ -10,61 +10,76 @@ import Pacientes from './pages/Pacientes.jsx';
 import Historias from './pages/Historias.jsx';
 import Seguimiento from './pages/SeguimientoPaciente.jsx';
 import Reposos from './pages/Reposos.jsx';
+import Doctores from './pages/Doctores.jsx';
 
 ////////////////////////// PANTALLAS FORMULARIOS ////////////////
 import ForConsultas from './Formularios/ForConsultas';
 import ForPacientes from './Formularios/ForPaciente.jsx'; 
 import ForHistorias from './Formularios/ForHistorias.jsx';
 import ForReposos from './Formularios/ForReposos.jsx';
+import ForDoctor from './Formularios/ForDoctor.jsx';
 ///////////////////////// COMPONENTES //////////////////////////
 import MainLayout from './components/MainLayout.jsx';
 import Header from "./components/header.jsx";
-////////////////////////// FIN IMPORTACIONES DE COMPONENTES//////////////////////////
-
+import { AlertProvider } from './components/AlertProvider.jsx';
+import { ToastProvider } from './components/ToapsProvider.jsx';
+//////////////////////////PANTALLA DE ERROR - SEGURIDAD PARA RUTAS///////////////////
+////////////////////////// IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////
+import SeccionOne from './pages/SeccionOne.jsx';
+////////////////////////// FIN IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////
+//////////////////////////IMPORTACIONES DE PANTALLAS DE ERRORES Y SEGURIDAD PARA RUTAS//////////////////////////
+import Error from './pages/Error.jsx';
+//////////////////////////FIN PANTALLA DE ERROR - SEGURIDAD PARA RUTAS///////////////////
 function App() {
 
 
   return (
     <>
-    <BrowserRouter>
-      <Routes>
-        {/* RUTAS PÚBLICAS */}
-          <Route 
-            path="/" 
-            element={
-              <Landing />
-            } 
-          />
-          <Route 
-            path="/login" 
-            element={
-              <>
-              <Header/>
-                <Login />
-            
-              </>
-            } 
-          />
+    <ToastProvider>
+      <AlertProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* RUTAS PÚBLICAS */}
+              <Route 
+                path="/" 
+                element={
+                  <Landing />
+                } 
+              />
+              <Route 
+                path="/login" 
+                element={
+                  <>
+                    <Login />
+                
+                  </>
+                } 
+              />
 
-          {/* RUTAS PRIVADAS */}
-            <Route path='/admin' element={<MainLayout/>}>
-              <Route index element={<DaskBoard/>} />
-              <Route path='Consultas' element={<Consultas/>} />
-              <Route path='ForConsultas' element={<ForConsultas/>} />
-              <Route path='Pacientes' element={<Pacientes/>} />
-              <Route path='ForPacientes' element={<ForPacientes/>} />
-              <Route path='Historias' element={<Historias/>} />
-              <Route path='ForHistorias' element={<ForHistorias/>} />
-              <Route path='Seguimiento' element={<Seguimiento/>} />
-              <Route path='Reposos' element={<Reposos/>} />
-              <Route path='ForReposos' element={<ForReposos/>} />
-            </Route>
+              {/* RUTAS PRIVADAS */}
+                <Route path='/admin' element={<MainLayout/>}>
+                  <Route index element={<DaskBoard/>} />
+                  <Route path='Consultas' element={<Consultas/>} />
+                  <Route path='ForConsultas' element={<ForConsultas/>} />
+                  <Route path='Pacientes' element={<Pacientes/>} />
+                  <Route path='ForPacientes' element={<ForPacientes/>} />
+                  <Route path='Historias' element={<Historias/>} />
+                  <Route path='ForHistorias' element={<ForHistorias/>} />
+                  <Route path='Seguimiento' element={<Seguimiento/>} />
+                  <Route path='Reposos' element={<Reposos/>} />
+                  <Route path='ForReposos' element={<ForReposos/>} />
+                  <Route path='Doctores' element={<Doctores/>} />
+                  <Route path='ForDoctor' element={<ForDoctor/>} />
+                  <Route path='SeccionOne' element={<SeccionOne/>} />
+                </Route>
 
-          {/* RUTA PARA ERROR 404 */}
-          <Route path="*" element={<h1> Página no encontrada -- Error 404 -- </h1>} />
-          
-      </Routes>   
-    </BrowserRouter>
+              {/* RUTA PARA ERROR 404 */}
+              <Route path="*" element={<Error/>} />
+              
+          </Routes>   
+        </BrowserRouter>
+      </AlertProvider>
+    </ToastProvider>
     </>
   )
 }

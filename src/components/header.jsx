@@ -1,17 +1,12 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import icon from '../components/icon';
 import '../index.css';
 
 function Header() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleClick = () => {
-    if (location.pathname === '/Login') {
-      navigate('/');
-    } else {
       navigate('/Login');
-    }
   };
 
   return (

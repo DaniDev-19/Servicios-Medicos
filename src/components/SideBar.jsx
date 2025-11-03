@@ -19,7 +19,7 @@ function Sidebar() {
         { to: '/admin/Consultas', label: 'Consultas', icon: icon.consulta3 },
         { to: '/admin/Historias', label: 'Historias', icon: icon.folder },
         { to: '/admin/Reposos', label: 'Reposos', icon: icon.mascarilla },
-        { to: '/admin/Administrador', label: 'Administrador', icon: icon.admin},
+        { to: '/admin/SeccionOne', label: 'Administrador', icon: icon.admin},
     ];
 
     return (
