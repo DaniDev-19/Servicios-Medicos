@@ -131,7 +131,7 @@ const handleView = async (id) => {
 const handleDelete = async (id) => {
     setLoading(true);
     try{
-        await axios.delete(`${BaseUrl}finalidad/${id}`, { headers: getAuthorization() });
+        await axios.delete(`${BaseUrl}finalidad/delete/${id}`, { headers: getAuthorization() });
         showToast('Finalidad Eliminada Con exito', 'success', 3000);
         await fetchFinalidades();
     }catch(error){

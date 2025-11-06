@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 import { BaseUrl } from '../utils/Constans';
-import { validateField, ValidationRule } from '../utils/validation';
+import { validateField, validationRules } from '../utils/validation';
 import '../index.css';
 import Spinner from '../components/spinner';
 import { useToast } from '../components/userToasd';

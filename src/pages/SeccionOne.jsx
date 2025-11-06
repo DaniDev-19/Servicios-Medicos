@@ -8,6 +8,7 @@ import Cargos from '../pages/Cargos';
 import Roles from '../pages/Roles';
 import Usuarios from '../pages/Usuarios';
 import Departamentos from "./Departamentos";
+import Finalidades from './Finalidades';
 
 function SeccionOne() {
   const tienePermiso = usePermiso();
@@ -21,6 +22,7 @@ function SeccionOne() {
       tienePermiso("cargos", "ver") && { key: "cargos", label: "Cargos" },
       tienePermiso("roles", "ver") && { key: "roles", label: "Seguridad y Roles" },
       tienePermiso("departamentos", "ver") && { key: "departamentos", label: "Departamentos" },
+      tienePermiso("finalidades", "ver") && { key: "finalidades", label: "finalidades" },
     ].filter(Boolean);
     // Si no hay tabs válidas, evita el error y muestra uno neutro
     return t.length ? t : [{ key: "no-access", label: "Sin acceso" }];
@@ -61,9 +63,11 @@ function SeccionOne() {
   }else if (activeTab === "roles" && tabs.some(t => t.key === "roles")) {
     tablaRenderizada = <Roles/>;
   }else if (activeTab === "usuarios" && tabs.some(t => t.key === "usuarios")) {
-    tablaRenderizada = <Usuarios/>
+    tablaRenderizada = <Usuarios/>;
   }else if (activeTab === "departamentos" && tabs.some(t => t.key === "departamentos" )) {
-    tablaRenderizada = <Departamentos/>
+    tablaRenderizada = <Departamentos/>;
+  }else if (activeTab === "finalidades" && tabs.some(t => t.key === "finalidades")) {
+      tablaRenderizada = <Finalidades/>;
   }
   if (activeTab === "no-access") {
     tablaRenderizada = (
