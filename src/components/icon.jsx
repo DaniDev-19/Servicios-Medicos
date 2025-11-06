@@ -72,7 +72,7 @@ const icon = {
     deshabilitar,
     bitacora,
     excel,
-    excel2
+    excel2,
     impresora2,
     muela,
     llave,
