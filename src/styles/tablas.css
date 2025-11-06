@@ -53,6 +53,10 @@
     flex-wrap: wrap;
 }
 
+.custom-table td {
+    max-width: 200px;
+}
+
 .custom-table th.active-sort {
     background-color: var(--azul-two);
 }
@@ -60,6 +64,13 @@
 .custom-table tr:hover {
     background-color: #d3eefc;
     transition: background 0.3s ease;
+}
+
+.row-actions{ 
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 6px; 
 }
 
 .no-data {

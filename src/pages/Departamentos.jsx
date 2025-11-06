@@ -125,7 +125,7 @@ function Departamentos() {
     const columns = [
         { header: "N°", key: "orden", render: (_row, idx) => idx + 1 },
         { accessor: "nombre", header: "Nombre", key: "nombre" },
-        { accessor: "descripcion", header: "Descripción", key: "descripcion" },
+        // { accessor: "descripcion", header: "Descripción", key: "descripcion" },
         {
         header: "Finalidades",
         key: "finalidades",
@@ -142,9 +142,9 @@ function Departamentos() {
         header: "Acciones",
         render: (row) => (
             <div className="row-actions" style={{ display: "flex", gap: 8 }}>
-            <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
-            <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
-            <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+                <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
+                <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+                <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
             </div>
         ),
         },

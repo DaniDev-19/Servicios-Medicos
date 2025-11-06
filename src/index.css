@@ -749,7 +749,7 @@ html { scroll-behavior: smooth; }
 .badge--success{ background: #eaf7ea; color: #1f6d1f; border-color: #cfe8cf; }
 .badge--muted{ background: #f1f1f1; color: #666; }
 
-.row-actions{ display: flex; gap: 6px; }
+
 
 
 .consultas-page .field label{ color: var(--grey); font-size: .9rem; }
