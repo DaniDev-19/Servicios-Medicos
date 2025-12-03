@@ -15,7 +15,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
-
+import { usePermiso } from '../utils/usePermiso';
 import '../styles/dashboard.css';
 import icon from '../components/icon';
 import { useAlert } from "../components/userAlert";
@@ -37,6 +37,7 @@ ChartJS.register(
 );
 
 function DashboardPage() {
+  const tienePermiso = usePermiso();
   const navigate = useNavigate();
   const showAlert = useAlert();
   const [loading, setLoading] = useState(true);
@@ -176,130 +177,143 @@ function DashboardPage() {
 
         {/* Tarjetas de Estadísticas */}
         <section className="stats-grid">
-          <div className="stat-card" onClick={() => navigate('/admin/pacientes')} style={{ cursor: 'pointer' }}>
-            <div className="stat-header">
-              <div className="stat-icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
-                <img src={icon.user4} alt="Pacientes" />
+          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+            <div className="stat-card" onClick={() => navigate('/admin/pacientes')} style={{ cursor: 'pointer' }}>
+              <div className="stat-header">
+                <div className="stat-icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                  <img src={icon.user4} alt="Pacientes" />
+                </div>
+                <span className="stat-label">Total Pacientes</span>
               </div>
-              <span className="stat-label">Total Pacientes</span>
+              <div className="stat-value">{stats.estadisticas.totalPacientes}</div>
+              <div className="stat-trend">Activos en sistema</div>
             </div>
-            <div className="stat-value">{stats.estadisticas.totalPacientes}</div>
-            <div className="stat-trend">Activos en sistema</div>
-          </div>
+          )}
 
-          <div className="stat-card" onClick={() => navigate('/admin/Historias')} style={{ cursor: 'pointer' }}>
-            <div className="stat-header">
-              <div className="stat-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' }}>
-                <img src={icon.carpetaplus2} alt="Historias" />
+          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+            <div className="stat-card" onClick={() => navigate('/admin/Historias')} style={{ cursor: 'pointer' }}>
+              <div className="stat-header">
+                <div className="stat-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' }}>
+                  <img src={icon.carpetaplus2} alt="Historias" />
+                </div>
+                <span className="stat-label">Historias Médicas</span>
               </div>
-              <span className="stat-label">Historias Médicas</span>
+              <div className="stat-value">{stats.estadisticas.totalHistorias}</div>
+              <div className="stat-trend">Expedientes digitales</div>
             </div>
-            <div className="stat-value">{stats.estadisticas.totalHistorias}</div>
-            <div className="stat-trend">Expedientes digitales</div>
-          </div>
-
-          <div className="stat-card" onClick={() => navigate('/admin/Consultas')} style={{ cursor: 'pointer' }}>
-            <div className="stat-header">
-              <div className="stat-icon-wrapper" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}>
-                <img src={icon.estetoscopio2} alt="Consultas" />
+          )}
+          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+            <div className="stat-card" onClick={() => navigate('/admin/Consultas')} style={{ cursor: 'pointer' }}>
+              <div className="stat-header">
+                <div className="stat-icon-wrapper" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}>
+                  <img src={icon.estetoscopio2} alt="Consultas" />
+                </div>
+                <span className="stat-label">Consultas Totales</span>
               </div>
-              <span className="stat-label">Consultas Totales</span>
+              <div className="stat-value">{stats.estadisticas.totalConsultas}</div>
+              <div className="stat-trend trend-up">+{stats.estadisticas.consultasHoy} hoy</div>
             </div>
-            <div className="stat-value">{stats.estadisticas.totalConsultas}</div>
-            <div className="stat-trend trend-up">+{stats.estadisticas.consultasHoy} hoy</div>
-          </div>
-
-          <div className="stat-card" onClick={() => navigate('/admin/Medicamentos')} style={{ cursor: 'pointer' }}>
-            <div className="stat-header">
-              <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
-                <img src={icon.maletindoctor4} alt="Medicamentos" />
+          )}
+          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+            <div className="stat-card" onClick={() => navigate('/admin/Medicamentos')} style={{ cursor: 'pointer' }}>
+              <div className="stat-header">
+                <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
+                  <img src={icon.maletindoctor4} alt="Medicamentos" />
+                </div>
+                <span className="stat-label">Inventario</span>
               </div>
-              <span className="stat-label">Inventario</span>
+              <div className="stat-value">{stats.estadisticas.totalMedicamentos}</div>
+              <div className="stat-trend">Productos registrados</div>
             </div>
-            <div className="stat-value">{stats.estadisticas.totalMedicamentos}</div>
-            <div className="stat-trend">Productos registrados</div>
-          </div>
+          )}
         </section>
 
         {/* Gráficos */}
         <section className="charts-grid">
-          <div className="chart-card">
-            <div className="chart-header">
-              <h3 className="chart-title">Consultas por Semana</h3>
+          {tienePermiso('ver', 'home') && ('graficas', 'home') && (
+            <div className="chart-card">
+              <div className="chart-header">
+                <h3 className="chart-title">Consultas por Semana</h3>
+              </div>
+              <div className="chart-container">
+                <Line options={lineChartOptions} data={lineChartData} />
+              </div>
             </div>
-            <div className="chart-container">
-              <Line options={lineChartOptions} data={lineChartData} />
-            </div>
-          </div>
+          )}
 
-          <div className="chart-card">
-            <div className="chart-header">
-              <h3 className="chart-title">Pacientes por Departamento</h3>
+          {tienePermiso('ver', 'home') && ('grafica', 'home') && (
+            <div className="chart-card">
+              <div className="chart-header">
+                <h3 className="chart-title">Pacientes por Departamento</h3>
+              </div>
+              <div className="chart-container">
+                <Doughnut options={doughnutOptions} data={doughnutData} />
+              </div>
             </div>
-            <div className="chart-container">
-              <Doughnut options={doughnutOptions} data={doughnutData} />
-            </div>
-          </div>
+          )}
         </section>
 
         {/* Actividad Reciente */}
-        <div className="sidebar-section">
-          <h3 className="sidebar-title">Actividad Reciente</h3>
-          <div className="info-list">
-            {stats.actividadReciente.length > 0 ? (
-              stats.actividadReciente.map((act, index) => (
-                <div key={index} className="info-item">
-                  <div className="info-dot"></div>
-                  <div className="info-content">
-                    <span className="info-text">{act.descripcion}</span>
-                    <span className="info-subtext">
-                      {new Date(act.fecha).toLocaleDateString()} {new Date(act.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {act.usuario}
-                    </span>
+        {tienePermiso('ver', 'home') && ('actividad', 'home') && (
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">Actividad Reciente</h3>
+            <div className="info-list">
+              {stats.actividadReciente.length > 0 ? (
+                stats.actividadReciente.map((act, index) => (
+                  <div key={index} className="info-item">
+                    <div className="info-dot"></div>
+                    <div className="info-content">
+                      <span className="info-text">{act.descripcion}</span>
+                      <span className="info-subtext">
+                        {new Date(act.fecha).toLocaleDateString()} {new Date(act.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {act.usuario}
+                      </span>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="info-item">
+                  <span className="info-text">No hay actividad reciente registrada.</span>
                 </div>
-              ))
-            ) : (
-              <div className="info-item">
-                <span className="info-text">No hay actividad reciente registrada.</span>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Columna Lateral */}
       <div className="dashboard-sidebar">
         {/* Acciones Rápidas */}
-        <div className="sidebar-section">
-          <h3 className="sidebar-title">Acciones Rápidas</h3>
-          <div className="quick-actions-grid">
-            <button className="action-btn" onClick={() => navigate('/admin/pacientes')}>
-              <img src={icon.user4} alt="Paciente" />
-              <span>Registrar Paciente</span>
-            </button>
-            <button className="action-btn" onClick={() => navigate('/admin/Historias')}>
-              <img src={icon.cv3} alt="Historia" />
-              <span>Nueva Historia</span>
-            </button>
-            <button className="action-btn" onClick={() => navigate('/admin/Consultas')}>
-              <img src={icon.estetoscopio2} alt="Consulta" />
-              <span>Nueva Consulta</span>
-            </button>
-            <button className="action-btn" onClick={() => navigate('/admin/Reposos')}>
-              <img src={icon.muela} alt="Reposo" />
-              <span>Registrar Reposo</span>
-            </button>
-            <button className="action-btn" onClick={() => navigate('/admin/Medicamentos')}>
-              <img src={icon.maletindoctor4} alt="Medicamento" />
-              <span>Cargar Medicamento</span>
-            </button>
-            <button className="action-btn" onClick={() => navigate('/admin/citas')}>
-              <img src={icon.calendario2} alt="Cita" />
-              <span>Agendar Cita</span>
-            </button>
+        {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">Acciones Rápidas</h3>
+            <div className="quick-actions-grid">
+              <button className="action-btn" onClick={() => navigate('/admin/pacientes')}>
+                <img src={icon.user4} alt="Paciente" />
+                <span>Registrar Paciente</span>
+              </button>
+              <button className="action-btn" onClick={() => navigate('/admin/Historias')}>
+                <img src={icon.cv3} alt="Historia" />
+                <span>Nueva Historia</span>
+              </button>
+              <button className="action-btn" onClick={() => navigate('/admin/Consultas')}>
+                <img src={icon.estetoscopio2} alt="Consulta" />
+                <span>Nueva Consulta</span>
+              </button>
+              <button className="action-btn" onClick={() => navigate('/admin/Reposos')}>
+                <img src={icon.muela} alt="Reposo" />
+                <span>Registrar Reposo</span>
+              </button>
+              <button className="action-btn" onClick={() => navigate('/admin/Medicamentos')}>
+                <img src={icon.maletindoctor4} alt="Medicamento" />
+                <span>Cargar Medicamento</span>
+              </button>
+              <button className="action-btn" onClick={() => navigate('/admin/citas')}>
+                <img src={icon.calendario2} alt="Cita" />
+                <span>Agendar Cita</span>
+              </button>
+            </div>
           </div>
-        </div>
-
+        )}
         {/* Próximas Citas */}
         <div className="sidebar-section">
           <h3 className="sidebar-title">Próximas Citas</h3>

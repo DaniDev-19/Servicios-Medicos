@@ -1,5 +1,5 @@
 export const PANTALLAS = [
-    { key: 'home', label: 'Home', acciones: ['ver'] },
+    { key: 'home', label: 'Home', acciones: ['ver', 'navegar', 'actividad', 'graficas'] },
     { key: 'atenciones', label: 'Atenciones', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'agendar'] },
     { key: 'citas', label: 'Citas', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'atender'] },
     { key: 'pacientes', label: 'Pacientes', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'seguimiento'] },
@@ -30,4 +30,7 @@ export const ACCIONES = [
     { key: 'atender', label: 'Atender' },
     { key: 'exportar', label: 'Exportar' },
     { key: 'seguimiento', label: 'Seguimiento' },
+    { key: 'actividad', label: 'Actividad' },
+    { key: 'graficas', label: 'Graficas' },
+    { key: 'navegar', label: 'Navegar' },
 ];
