@@ -42,7 +42,7 @@
   justify-content: center;
   min-height: 100vh;
   /* padding: 24px; */
-  background-image: url('./images/fondo3.jpg');
+  background-image: url('./images/fondo3.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -342,7 +342,7 @@ html {
 
 .hero {
   position: relative;
-  background: url('./images/fondo5.jpg') center/cover no-repeat fixed;
+  background: url('./images/fondo5.webp') center/cover no-repeat fixed;
   isolation: isolate;
 }
 
@@ -586,7 +586,7 @@ html {
 }
 
 .cta {
-  background: url('./images/fondo2.jpg') center/cover no-repeat fixed;
+  background: url('./images/fondo2.webp') center/cover no-repeat fixed;
   position: relative;
   isolation: isolate;
 }
