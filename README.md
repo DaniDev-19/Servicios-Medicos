@@ -1,12 +1,30 @@
-# React + Vite
+# Cuidarte Yutong - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plataforma web para la gestión integral de servicios médicos, desarrollada con **React** y **Vite**. Permite la administración de historias clínicas, usuarios, medicamentos, notificaciones y reportes, con una interfaz moderna y responsiva.
 
-Currently, two official plugins are available:
+## 🚀 Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Gestión de usuarios, roles y permisos
+- Registro y consulta de historias médicas
+- Administración de pacientes y doctores
+- Inventario de medicamentos
+- Notificaciones internas y alertas
+- Dashboards y reportes exportables (PDF/Excel)
+- Seguridad y control de acceso por roles
 
-## Expanding the ESLint configuration
+## 🛠️ Tecnologías
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- Vite
+- Axios
+- Chart.js
+- CSS Modules
+- Vercel (despliegue)
+
+## 📦 Instalación
+
+```bash
+git clone https://github.com/tuusuario/cuidarte-yutong-frontend.git
+cd cuidarte-yutong-frontend
+npm install
+npm run dev
