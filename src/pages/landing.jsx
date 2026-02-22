@@ -143,18 +143,12 @@ function Landing() {
           {/* Columna central: dev-BadDev (íconos + email con ícono) */}
           <section className="dev-BadDev">
             <div className="dev-icons">
-              <a href="https://github.com/JDPR19" className="dev-icon" title="GitHub --> BadDev " rel="noopener noreferrer" target="_blank">
+              <a href="https://dani-dev-tan.vercel.app/es" className="dev-icon" title="My Web --> DaniDev " rel="noopener noreferrer" target="_blank">
                 <img src={icon.github} alt="icono" className="icon" />
               </a>
-              {/* <a href="#" className="dev-icon" title="Telegram --> BadDev">
-                    <img src={icon.telegram} alt="icono" className="icon"/>
-                  </a>
-                  <a href="#" className="dev-icon" title="Pagina --> BadDev">
-                    <img src={icon.cv2} alt="icono" className="icon"/>
-                  </a> */}
             </div>
 
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=baddevprogramming@gmail.com" className="dev-mail" title="Contactame --> Soporte Técnico - Asesorias y Mentorias - Desarrollo de Aplicaciones Web y Mucho Mas --> BadDev --> Una Huella • Un Logo • Una Esencia • Con Total Compromiso y Pasión --> • Seguimos Avanzando en la Construcción de Nuevas Mecánicas que Solventen el por Venir de los Tiempos • Innovando Soluciones • BadDev" target='_blank' rel="noopener noreferrer">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=baddevprogramming@gmail.com" className="dev-mail" title="Contactame --> Soporte Técnico - Asesorias y Mentorias - Desarrollo de Aplicaciones Web y Mucho Mas --> DaniDev --> Una Huella • Un Logo • Una Esencia • Con Total Compromiso y Pasión --> • Seguimos Avanzando en la Construcción de Nuevas Mecánicas que Solventen el por Venir de los Tiempos • Innovando Soluciones • DaniDev" target='_blank' rel="noopener noreferrer">
               <img src={icon.link} alt="icon-Link" className="dev-mailIcon" />
               BadDevPrograming@Gmail.com
             </a>
