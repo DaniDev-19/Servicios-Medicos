@@ -14,31 +14,36 @@ export function generateReposoPDF(reposo) {
     const contentWidth = pageWidth - (margin * 2);
     let y = margin;
 
+    // --- Borde de Página ---
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     // --- Header (Cintillo) ---
     try {
         const imgWidth = contentWidth;
         const imgHeight = 25;
         doc.addImage(cintillo, 'PNG', margin, y, imgWidth, imgHeight);
-        y += imgHeight + 15;
+        y += imgHeight + 12;
     } catch (e) {
-        console.error("Error cargando cintillo", e);
         y += 30;
     }
 
     // --- Título ---
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(20, 40, 80);
     doc.text('CONSTANCIA DE REPOSO MÉDICO', pageWidth / 2, y, { align: 'center' });
-    y += 10;
+    y += 8;
 
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(100);
-    doc.text(`Código: ${reposo.codigo || 'S/N'}`, pageWidth / 2, y, { align: 'center' });
-    y += 15;
+    doc.text(`CÓDIGO DE CONTROL: ${reposo.codigo || 'S/N'}`, pageWidth / 2, y, { align: 'center' });
+    y += 12;
 
     // --- Línea separadora ---
-    doc.setDrawColor(200);
+    doc.setDrawColor(20, 40, 80);
+    doc.setLineWidth(0.5);
     doc.line(margin, y, pageWidth - margin, y);
     y += 10;
 
@@ -136,381 +141,211 @@ export function generateHistoriaClinicaPDF(historia) {
     const contentWidth = pageWidth - (margin * 2);
     let y = margin;
 
+    // --- Borde de Página ---
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     // --- Header (Cintillo) ---
     try {
         const imgWidth = contentWidth;
-        const imgHeight = 20;
+        const imgHeight = 22;
         doc.addImage(cintillo, 'PNG', margin, y, imgWidth, imgHeight);
-        y += imgHeight + 15;
+        y += imgHeight + 10;
     } catch (e) {
         y += 25;
     }
 
     // --- Título Principal ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0);
-    doc.text('HISTORIA CLÍNICA', pageWidth / 2, y, { align: 'center' });
+    doc.setFont('times', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(20, 40, 80);
+    doc.text('HISTORIA CLÍNICA DIGITAL', pageWidth / 2, y, { align: 'center' });
     y += 8;
 
     // Código de Historia
     doc.setFontSize(11);
-    doc.setTextColor(80);
+    doc.setTextColor(100);
     const codigoHistoria = historia.codigo || 'S/N';
-    doc.text(`N° DE HISTORIA: ${codigoHistoria}`, pageWidth / 2, y, { align: 'center' });
+    doc.text(`N° DE EXPEDIENTE: ${codigoHistoria}`, pageWidth / 2, y, { align: 'center' });
     y += 10;
 
     // Línea decorativa
-    doc.setDrawColor(80);
-    doc.setLineWidth(0.5);
+    doc.setDrawColor(20, 40, 80);
+    doc.setLineWidth(0.8);
     doc.line(margin, y, pageWidth - margin, y);
-    y += 8;
+    y += 10;
 
-    // === SECCIÓN I: DATOS DEL PACIENTE ===
-    doc.setFillColor(80);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('I. DATOS DEL PACIENTE', margin + 2, y + 5);
-    y += 15;
-
-    doc.setTextColor(0);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(9);
-
-    // Fila 1: Nombre completo y Cédula
-    doc.setFont('times', 'bold');
-    doc.text('Nombre Completo:', margin + 2, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.text(`${historia.nombre_paciente || ''} ${historia.apellido_paciente || ''}`.toUpperCase(), margin + 30, y);
-
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('C.I:', margin + 80, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.text(historia.cedula_paciente || 'N/A', margin + 88, y);
-    y += 6;
-
-    // Fila 2: Edad, Sexo, Fecha de Nacimiento
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('Edad:', margin + 2, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.text(`${historia.edad_paciente || 'N/A'} años`, margin + 12, y);
-
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('Sexo:', margin + 40, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.text(historia.sexo_paciente || 'N/A', margin + 50, y);
-
-    if (historia.fecha) {
-        doc.setFont('times', 'bold');
-        doc.setFontSize(9);
-        doc.text('F. Nacimiento:', margin + 80, y);
-        doc.setFont('times', 'normal');
-        doc.setFontSize(10);
-        try {
-            let fechaFormateada = 'N/A';
-            const fechaStr = historia.fecha.toString().trim();
-
-            // se parsea formato DD/MM/YY HH:MM
-            const match = fechaStr.match(/^(\d{2})\/(\d{2})\/(\d{2})/);
-            if (match) {
-                const dia = match[1];
-                const mes = match[2];
-                let anio = match[3];
-
-                // Convertir año de 2 dígitos a 4 dígitos
-                // Si es >= 50, asumimos 1900s, si no, 2000s
-                anio = parseInt(anio) >= 50 ? `19${anio}` : `20${anio}`;
-
-                fechaFormateada = `${dia}/${mes}/${anio}`;
-            }
-
-            doc.text(fechaFormateada, margin + 105, y);
-        } catch (e) {
-            console.error('Error parsing fecha:', e);
-            doc.text('N/A', margin + 105, y);
-        }
-    }
-    y += 6;
-
-    // Fila 3: Contacto y Correo
-    if (historia.contacto_paciente) {
-        doc.setFont('times', 'bold');
-        doc.setFontSize(9);
-        doc.text('Teléfono:', margin + 2, y);
-        doc.setFont('times', 'normal');
-        doc.setFontSize(10);
-        doc.text(historia.contacto_paciente, margin + 16, y);
-    }
-
-    if (historia.correo_paciente) {
-        doc.setFont('times', 'bold');
-        doc.setFontSize(9);
-        doc.text('Correo:', margin + 80, y);
-        doc.setFont('times', 'normal');
-        doc.setFontSize(10);
-        doc.text(historia.correo_paciente, margin + 92, y);
-    }
-    y += 6;
-
-    // Fila 4: Dirección completa
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('Dirección:', margin + 2, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(9);
-    const direccion = `${historia.estado_nombre_paciente || ''}, ${historia.municipio_nombre_paciente || ''}, ${historia.parroquia_nombre_paciente || ''}, ${historia.sector_nombre_paciente || ''}`.replace(/^,\s*|,\s*$/g, '');
-    const splitDir = doc.splitTextToSize(direccion || 'No especificada', contentWidth - 25);
-    doc.text(splitDir, margin + 18, y);
-    y += (splitDir.length * 4) + 4;
-
-    // Fila 5: Datos laborales
-    if (historia.departamento_nombre_paciente) {
-        doc.setFont('times', 'bold');
-        doc.setFontSize(9);
-        doc.text('Departamento:', margin + 2, y);
-        doc.setFont('times', 'normal');
-        doc.text(historia.departamento_nombre_paciente || 'N/A', margin + 25, y);
-
-        y += 5;
-    }
-
-    if (historia.profesion_nombre_paciente || historia.cargo_nombre_paciente) {
-        doc.setFont('times', 'bold');
-        doc.text('Profesión:', margin + 2, y);
-        doc.setFont('times', 'normal');
-        doc.text(historia.profesion_nombre_paciente, margin + 20, y);
-
-
-        doc.setFont('times', 'bold');
-        doc.text('Cargo:', margin + 70, y);
-        doc.setFont('times', 'normal');
-        doc.text(historia.cargo_nombre_paciente || 'N/A', margin + 80, y);
-
-        y += 5;
-    }
-
-    y += 3;
-
-    // === SECCIÓN II: DATOS DE LA CONSULTA ===
-    if (y > pageHeight - 80) { doc.addPage(); y = margin + 10; }
-
-    doc.setFillColor(80);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('II. DATOS DE LA CONSULTA', margin + 2, y + 5);
-    y += 15;
-
-    doc.setTextColor(0);
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-
-    // Fecha de consulta
-    doc.text('Fecha Consulta:', margin + 2, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    const fechaConsulta = historia.fecha_consulta ? new Date(historia.fecha_consulta).toLocaleDateString('es-VE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }) : 'N/A';
-    doc.text(fechaConsulta, margin + 28, y);
-
-    // Fecha de alta
-    if (historia.fecha_alta) {
-        doc.setFont('times', 'bold');
-        doc.setFontSize(9);
-        doc.text('Fecha Alta:', margin + 80, y);
-        doc.setFont('times', 'normal');
-        doc.setFontSize(10);
-        const fechaAlta = new Date(historia.fecha_alta).toLocaleDateString('es-VE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-        doc.text(fechaAlta, margin + 100, y);
-    }
-    y += 6;
-
-    // Médico tratante
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('Médico Tratante:', margin + 2, y);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.text(`Dr(a). ${historia.nombre_doctor || ''} ${historia.apellido_doctor || ''}`, margin + 30, y);
-    y += 6;
-
-    // Cargo y profesión del doctor
-    if (historia.cargo_nombre_doctor || historia.profesion_nombre_doctor) {
-        doc.setFont('times', 'italic');
-        doc.setFontSize(8);
-        doc.text(`${historia.cargo_nombre_doctor || ''} - ${historia.profesion_nombre_doctor || ''}`, margin + 30, y);
-        y += 5;
-    }
-
-    y += 3;
-
-    // === SECCIÓN III: ANAMNESIS ===
-    if (y > pageHeight - 70) { doc.addPage(); y = margin + 10; }
-
-    doc.setFillColor(80);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('III. ANAMNESIS', margin + 2, y + 5);
-    y += 15;
-
-    doc.setTextColor(0);
-
-    // Motivo de consulta
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('Motivo de Consulta:', margin + 2, y);
-    y += 5;
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    const splitMotivo = doc.splitTextToSize(historia.motivo_consulta || 'No especificado', contentWidth - 4);
-    doc.text(splitMotivo, margin + 2, y);
-    y += (splitMotivo.length * 5) + 5;
-
-    // Historia / Enfermedad actual
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9);
-    doc.text('Enfermedad Actual / Historia:', margin + 2, y);
-    y += 5;
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    const splitHistoria = doc.splitTextToSize(historia.historia || 'No especificado', contentWidth - 4);
-    doc.text(splitHistoria, margin + 2, y);
-    y += (splitHistoria.length * 5) + 6;
-
-    // === SECCIÓN IV: EXAMEN FÍSICO ===
-    if (y > pageHeight - 60) { doc.addPage(); y = margin + 10; }
-
-    doc.setFillColor(80);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('IV. EXAMEN FÍSICO', margin + 2, y + 5);
-    y += 15;
-
-    doc.setTextColor(0);
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    const splitExamen = doc.splitTextToSize(historia.examen_fisico || 'Sin hallazgos registrados', contentWidth - 4);
-    doc.text(splitExamen, margin + 2, y);
-    y += (splitExamen.length * 5) + 6;
-
-    // === SECCIÓN V: DIAGNÓSTICO ===
-    if (y > pageHeight - 60) { doc.addPage(); y = margin + 10; }
-
-    doc.setFillColor(80);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('V. DIAGNÓSTICO', margin + 2, y + 5);
-    y += 15;
-
-    doc.setTextColor(0);
-    doc.setFont('times', 'bold');
-    doc.setFontSize(11);
-    const splitDiag = doc.splitTextToSize((historia.diagnostico || 'No especificado').toUpperCase(), contentWidth - 4);
-    doc.text(splitDiag, margin + 2, y);
-    y += (splitDiag.length * 6) + 5;
-
-    // Enfermedades relacionadas
-    if (historia.detalle && historia.detalle.length > 0) {
-        doc.setFont('times', 'bold');
-        doc.setFontSize(9);
-        doc.text('Patologías Relacionadas:', margin + 2, y);
-        y += 5;
-        doc.setFont('times', 'normal');
-        doc.setFontSize(9);
-        historia.detalle.forEach(d => {
-            if (y > pageHeight - 25) { doc.addPage(); y = margin + 10; }
-            doc.text(`• ${d.enfermedad_nombre}`, margin + 5, y);
-            doc.setFont('times', 'italic');
-            doc.setFontSize(8);
-            doc.text(`(${d.categoria_nombre || 'General'})`, margin + 7 + doc.getTextWidth(`• ${d.enfermedad_nombre} `), y);
-            doc.setFont('times', 'normal');
-            doc.setFontSize(9);
-            y += 4;
-        });
-        y += 4;
-    }
-
-    // === SECCIÓN VI: OBSERVACIONES / PLAN ===
-    if (historia.observacion) {
-        if (y > pageHeight - 50) { doc.addPage(); y = margin + 10; }
-
-        doc.setFillColor(80);
+    // Helper para dibujar secciones
+    const drawSectionHeader = (title) => {
+        doc.setFillColor(20, 40, 80);
         doc.rect(margin, y, contentWidth, 7, 'F');
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.setTextColor(255, 255, 255);
-        doc.text('VI. OBSERVACIONES / PLAN DE TRATAMIENTO', margin + 2, y + 5);
-        y += 15;
-
+        doc.setTextColor(255);
+        doc.text(title, margin + 3, y + 5);
+        y += 12;
         doc.setTextColor(0);
-        doc.setFont('times', 'normal');
+    };
+
+    // Helper para dibujar filas de datos
+    const drawDataRow = (label, value, x = margin + 2, labelW = 40) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text(label, x, y);
+        doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
-        const splitObs = doc.splitTextToSize(historia.observacion, contentWidth - 4);
-        doc.text(splitObs, margin + 2, y);
-        y += (splitObs.length * 5) + 8;
+        doc.text(String(value || 'N/A'), x + labelW, y);
+    };
+
+    // === SECCIÓN I: DATOS DEL PACIENTE ===
+    drawSectionHeader('I. INFORMACIÓN DE IDENTIFICACIÓN DEL PACIENTE');
+
+    drawDataRow('Nombre Completo:', `${historia.nombre_paciente || ''} ${historia.apellido_paciente || ''}`.toUpperCase());
+    drawDataRow('Cédula:', historia.cedula_paciente, margin + 110, 15);
+    y += 7;
+
+    drawDataRow('Edad:', `${historia.edad_paciente || 'N/A'} años`);
+    drawDataRow('Sexo:', historia.sexo_paciente, margin + 60, 12);
+
+    if (historia.fecha) {
+        let fNac = 'N/A';
+        try {
+            const match = historia.fecha.toString().trim().match(/^(\d{2})\/(\d{2})\/(\d{2})/);
+            if (match) {
+                let anio = parseInt(match[3]) >= 50 ? `19${match[3]}` : `20${match[3]}`;
+                fNac = `${match[1]}/${match[2]}/${anio}`;
+            }
+        } catch (e) { }
+        drawDataRow('F. Nacimiento:', fNac, margin + 110, 25);
     }
+    y += 7;
 
-    // === Firma del Médico ===
-    if (y > pageHeight - 45) { doc.addPage(); y = margin + 10; }
-
-    y = Math.max(y, pageHeight - 45);
-
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.3);
-    doc.line(pageWidth / 2 - 35, y, pageWidth / 2 + 35, y);
+    drawDataRow('Teléfono:', historia.contacto_paciente);
+    drawDataRow('Correo:', historia.correo_paciente, margin + 110, 15);
+    y += 7;
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(0);
-    doc.text(`Dr(a). ${historia.nombre_doctor || ''} ${historia.apellido_doctor || ''}`, pageWidth / 2, y + 5, { align: 'center' });
-
+    doc.setFontSize(9);
+    doc.text('Dirección:', margin + 2, y);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text('Médico Tratante', pageWidth / 2, y + 9, { align: 'center' });
-    if (historia.cargo_nombre_doctor) {
-        doc.setFontSize(7);
-        doc.text(historia.cargo_nombre_doctor, pageWidth / 2, y + 12, { align: 'center' });
+    doc.setFontSize(9);
+    const direccion = `${historia.estado_nombre_paciente || ''}, ${historia.municipio_nombre_paciente || ''}, ${historia.parroquia_nombre_paciente || ''}, ${historia.sector_nombre_paciente || ''}`.replace(/^,\s*|,\s*$/g, '');
+    const splitDir = doc.splitTextToSize(direccion || 'No especificada', contentWidth - 25);
+    doc.text(splitDir, margin + 25, y);
+    y += (splitDir.length * 4) + 6;
+
+    if (historia.departamento_nombre_paciente) {
+        drawDataRow('Departamento:', historia.departamento_nombre_paciente);
+        y += 7;
     }
 
-    // === Footer en todas las páginas ===
-    const totalPages = doc.internal.getNumberOfPages();
-    const fechaGeneracion = new Date().toLocaleDateString('es-VE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    if (historia.profesion_nombre_paciente || historia.cargo_nombre_paciente) {
+        drawDataRow('Profesión:', historia.profesion_nombre_paciente);
+        drawDataRow('Cargo:', historia.cargo_nombre_paciente, margin + 110, 15);
+        y += 10;
+    }
 
+    // === SECCIÓN II: DATOS DE LA CONSULTA ===
+    if (y > pageHeight - 60) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+    drawSectionHeader('II. REGISTRO DE ATENCIÓN MÉDICA');
+
+    const fConsulta = historia.fecha_consulta ? new Date(historia.fecha_consulta).toLocaleDateString('es-VE') : 'N/A';
+    drawDataRow('Fecha Consulta:', fConsulta);
+
+    if (historia.fecha_alta) {
+        const fAlta = new Date(historia.fecha_alta).toLocaleDateString('es-VE');
+        drawDataRow('Fecha Alta:', fAlta, margin + 110, 25);
+    }
+    y += 7;
+
+    drawDataRow('Médico Tratante:', `Dr(a). ${historia.nombre_doctor || ''} ${historia.apellido_doctor || ''}`);
+    y += 10;
+
+    // === SECCIÓN III: ANAMNESIS Y EVALUACIÓN ===
+    if (y > pageHeight - 80) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+    drawSectionHeader('III. ANAMNESIS Y EXAMEN FÍSICO');
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Motivo de Consulta:', margin + 2, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    const splitMotivo = doc.splitTextToSize(historia.motivo_consulta || 'No especificado', contentWidth - 4);
+    doc.text(splitMotivo, margin + 4, y);
+    y += (splitMotivo.length * 5) + 6;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Enfermedad Actual / Historia:', margin + 2, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    const splitHistoria = doc.splitTextToSize(historia.historia || 'No especificado', contentWidth - 4);
+    doc.text(splitHistoria, margin + 4, y);
+    y += (splitHistoria.length * 5) + 6;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Examen Físico:', margin + 2, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    const splitExamen = doc.splitTextToSize(historia.examen_fisico || 'Sin hallazgos registrados', contentWidth - 4);
+    doc.text(splitExamen, margin + 4, y);
+    y += (splitExamen.length * 5) + 10;
+
+    // === SECCIÓN V: JUICIO CLÍNICO Y DIAGNÓSTICO ===
+    if (y > pageHeight - 60) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+    drawSectionHeader('IV. DIAGNÓSTICO Y PATOLOGÍASASOCIADAS');
+
+    doc.setFont('times', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(150, 0, 0); // Rojo formal para diagnóstico
+    const splitDiag = doc.splitTextToSize((historia.diagnostico || 'No especificado').toUpperCase(), contentWidth - 4);
+    doc.text(splitDiag, margin + 2, y);
+    y += (splitDiag.length * 6) + 6;
+    doc.setTextColor(0);
+
+    if (historia.detalle && historia.detalle.length > 0) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('Patologías Relacionadas (CIE-10):', margin + 2, y);
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        historia.detalle.forEach(d => {
+            if (y > pageHeight - 30) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+            doc.text(`• ${d.enfermedad_nombre} (${d.categoria_nombre || 'General'})`, margin + 6, y);
+            y += 5;
+        });
+        y += 5;
+    }
+
+    // === SECCIÓN VI: PLAN DE TRATAMIENTO ===
+    if (historia.observacion) {
+        if (y > pageHeight - 50) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+        drawSectionHeader('V. OBSERVACIONES Y PLAN DE TRATAMIENTO');
+        const splitObs = doc.splitTextToSize(historia.observacion, contentWidth - 4);
+        doc.text(splitObs, margin + 4, y);
+        y += (splitObs.length * 5) + 15;
+    }
+
+    // === Firmas ===
+    y = pageHeight - 45;
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.5);
+    doc.line(pageWidth / 2 - 40, y, pageWidth / 2 + 40, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(`Dr(a). ${historia.nombre_doctor || ''} ${historia.apellido_doctor || ''}`, pageWidth / 2, y + 5, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text('Firma y Sello del Médico Tratante', pageWidth / 2, y + 9, { align: 'center' });
+
+    // === Footer ===
+    const totalPages = doc.internal.getNumberOfPages();
+    const fGen = new Date().toLocaleString('es-VE');
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         doc.setFontSize(7);
         doc.setTextColor(120);
-        doc.text(`Sistema Integral de Servicios Médicos Yutong • Generado: ${fechaGeneracion}`, margin, pageHeight - 7);
-        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 7, { align: 'right' });
+        doc.text(`Expediente Médico - Yutong Venezuela • Generado: ${fGen}`, margin, pageHeight - 8);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 8, { align: 'right' });
     }
 
     return doc.output('blob');
@@ -539,14 +374,19 @@ export function generateFichaPacientePDF(data) {
     }
 
     // --- Título ---
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(22);
-    doc.setTextColor(0, 51, 160);
-    doc.text('FICHA DE PACIENTE', pageWidth / 2, y, { align: 'center' });
+    doc.setTextColor(20, 40, 80);
+    doc.text('FICHA INTEGRAL DEL PACIENTE', pageWidth / 2, y, { align: 'center' });
     y += 15;
 
+    // --- Borde de Página ---
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     // --- SECCIÓN I: DATOS PERSONALES ---
-    doc.setFillColor(0, 51, 160);
+    doc.setFillColor(20, 40, 80);
     doc.rect(margin, y, contentWidth, 8, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -615,7 +455,7 @@ export function generateFichaPacientePDF(data) {
     y += (splitUbicacion.length * 6) + 10;
 
     // --- SECCIÓN II: INFORMACIÓN CLÍNICA BÁSICA ---
-    doc.setFillColor(0, 51, 160);
+    doc.setFillColor(20, 40, 80);
     doc.rect(margin, y, contentWidth, 8, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -756,15 +596,15 @@ export function generateFichaPacientePDF(data) {
     const activeReposo = reposos && reposos.find(r => r.estado === 'activo');
 
     if (activeReposo) {
-        doc.setFillColor(240, 248, 255); // Light blue background for reposo box
+        doc.setFillColor(245, 245, 245); // Gris muy claro
         doc.rect(margin, y, contentWidth, 35, 'F');
-        doc.setDrawColor(0, 51, 160);
+        doc.setDrawColor(20, 40, 80);
         doc.rect(margin, y, contentWidth, 35, 'S');
 
         y += 6;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 51, 160);
+        doc.setTextColor(20, 40, 80);
         doc.text('REPOSO MÉDICO ACTIVO', margin + 5, y);
         doc.setTextColor(0);
 
@@ -835,11 +675,16 @@ export function generateInformeSeguimientoPDF(data) {
     } catch (e) { y += 25; }
 
     // --- Título y Paciente ---
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(18);
-    doc.setTextColor(0, 51, 160);
+    doc.setTextColor(20, 40, 80);
     doc.text('INFORME DE SEGUIMIENTO Y ESTADÍSTICAS', pageWidth / 2, y, { align: 'center' });
     y += 10;
+
+    // --- Borde de Página ---
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
 
     doc.setFontSize(12);
     doc.setTextColor(0);
@@ -864,19 +709,19 @@ export function generateInformeSeguimientoPDF(data) {
 
     let statY = y + 15;
     // Columna 1
-    doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 51, 160); doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 40, 80); doc.setFontSize(16);
     doc.text(totalConsultas.toString(), margin + 25, statY, { align: 'center' });
     doc.setFontSize(9); doc.setTextColor(80);
     doc.text('Consultas', margin + 25, statY + 5, { align: 'center' });
 
     // Columna 2
-    doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 51, 160); doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 40, 80); doc.setFontSize(16);
     doc.text(totalReposos.toString(), margin + 75, statY, { align: 'center' });
     doc.setFontSize(9); doc.setTextColor(80);
     doc.text('Reposos', margin + 75, statY + 5, { align: 'center' });
 
     // Columna 3
-    doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 51, 160); doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 40, 80); doc.setFontSize(16);
     doc.text(totalSeguimientos.toString(), margin + 125, statY, { align: 'center' });
     doc.setFontSize(9); doc.setTextColor(80);
     doc.text('Seguimientos', margin + 125, statY + 5, { align: 'center' });
@@ -896,13 +741,13 @@ export function generateInformeSeguimientoPDF(data) {
     doc.text('HISTÓRICO DE REPOSOS', margin, y);
     y += 5;
     doc.setLineWidth(0.5);
-    doc.setDrawColor(0, 51, 160);
+    doc.setDrawColor(20, 40, 80);
     doc.line(margin, y, pageWidth - margin, y);
     y += 8;
 
     if (reposos.length > 0) {
         // Table Header
-        doc.setFillColor(0, 51, 160);
+        doc.setFillColor(20, 40, 80);
         doc.rect(margin, y, contentWidth, 8, 'F');
         doc.setFontSize(9); doc.setTextColor(255); doc.setFont('helvetica', 'bold');
         doc.text('Código', margin + 2, y + 5.5);
@@ -960,7 +805,7 @@ export function generateInformeSeguimientoPDF(data) {
     doc.setTextColor(0);
     doc.text('CONSULTAS Y SEGUIMIENTOS ASOCIADOS', margin, y);
     y += 5;
-    doc.setDrawColor(0, 51, 160);
+    doc.setDrawColor(20, 40, 80);
     doc.line(margin, y, pageWidth - margin, y);
     y += 10;
 
@@ -1000,7 +845,7 @@ export function generateInformeSeguimientoPDF(data) {
                     doc.line(margin + 12, y - 5, margin + 12, y + 5);
 
                     // Bullet & Date
-                    doc.setFontSize(9); doc.setTextColor(0, 51, 160); doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(9); doc.setTextColor(20, 40, 80); doc.setFont('helvetica', 'bold');
                     const fechaSeg = new Date(seg.fecha_registro).toLocaleDateString('es-VE');
                     doc.text(`• Seguimiento (${fechaSeg})`, margin + 18, y);
 
@@ -1049,292 +894,162 @@ export function generateConsultaPDF(consulta) {
     const contentWidth = pageWidth - (margin * 2);
     let y = margin;
 
+    // --- Borde de Página ---
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     // --- Header (Cintillo) ---
     try {
         const imgWidth = contentWidth;
-        const imgHeight = 20;
+        const imgHeight = 22;
         doc.addImage(cintillo, 'PNG', margin, y, imgWidth, imgHeight);
-        y += imgHeight + 15;
+        y += imgHeight + 10;
     } catch (e) {
-        y += 25;
+        y += 20;
     }
 
     // --- Título Principal ---
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(20);
-    doc.setTextColor(0, 51, 160); // Azul corporativo
-    doc.text('CONSULTA MÉDICA', pageWidth / 2, y, { align: 'center' });
+    doc.setTextColor(20, 40, 80);
+    doc.text('RESUMEN DE CONSULTA MÉDICA', pageWidth / 2, y, { align: 'center' });
     y += 6;
 
     // Código de Consulta
     doc.setFontSize(10);
     doc.setTextColor(100);
     const codigoConsulta = consulta.codigo || 'S/N';
-    doc.text(`Código: ${codigoConsulta}`, pageWidth / 2, y, { align: 'center' });
+    doc.text(`CÓDIGO DE CONTROL: ${codigoConsulta}`, pageWidth / 2, y, { align: 'center' });
     y += 10;
 
     // Línea decorativa
-    doc.setDrawColor(0, 51, 160);
+    doc.setDrawColor(20, 40, 80);
     doc.setLineWidth(0.8);
     doc.line(margin, y, pageWidth - margin, y);
-    y += 8;
-
-    // === SECCIÓN: INFORMACIÓN GENERAL (2 columnas) ===
-    const col1X = margin + 2;
-    const col2X = pageWidth / 2 + 5;
-    const labelWidth = 35;
-
-    // Columna 1: Datos del Paciente
-    doc.setFillColor(240, 240, 240);
-    doc.rect(margin, y, contentWidth / 2 - 2, 6, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(0, 51, 160);
-    doc.text('DATOS DEL PACIENTE', col1X, y + 4);
     y += 10;
 
-    // Nombre
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(80);
-    doc.text('Paciente:', col1X, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(0);
-    const nombreCompleto = `${consulta.paciente_nombre || ''} ${consulta.paciente_apellido || ''}`.toUpperCase();
-    doc.text(nombreCompleto, col1X + labelWidth, y);
-    y += 5;
-
-    // Cédula
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(80);
-    doc.text('Cédula:', col1X, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(0);
-    doc.text(consulta.paciente_cedula || 'N/A', col1X + labelWidth, y);
-
-    // Resetear Y para columna 2
-    y -= 15; // Volver al inicio de la sección
-
-    // Columna 2: Datos de la Consulta
-    doc.setFillColor(240, 240, 240);
-    doc.rect(pageWidth / 2 + 3, y, contentWidth / 2 - 2, 6, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(0, 51, 160);
-    doc.text('DATOS DE LA CONSULTA', col2X, y + 4);
-    y += 10;
-
-    // Fecha
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(80);
-    doc.text('Fecha:', col2X, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(0);
-    const fechaAtencion = consulta.fecha_atencion_formatted ||
-        (consulta.fecha_atencion ? new Date(consulta.fecha_atencion).toLocaleString('es-VE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }) : 'N/A');
-    doc.text(fechaAtencion, col2X + labelWidth, y);
-    y += 5;
-
-    // Estatus
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(80);
-    doc.text('Estatus:', col2X, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-
-    // Color según estatus
-    const estatus = (consulta.estatus || '').toLowerCase();
-    if (estatus === 'realizada') doc.setTextColor(0, 128, 0);
-    else if (estatus === 'pendiente') doc.setTextColor(255, 140, 0);
-    else if (estatus === 'cancelada') doc.setTextColor(200, 0, 0);
-    else doc.setTextColor(0);
-
-    doc.text((consulta.estatus || 'N/A').toUpperCase(), col2X + labelWidth, y);
-    doc.setTextColor(0);
-
-    y += 12;
-
-    // === SECCIÓN: DIAGNÓSTICO ===
-    doc.setFillColor(0, 51, 160);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('DIAGNÓSTICO', margin + 2, y + 5);
-    y += 12;
-
-    // Enfermedad diagnosticada (destacada)
-    if (consulta.enfermedad_nombre) {
-        doc.setFillColor(255, 250, 205); // Amarillo suave
-        doc.rect(margin, y - 2, contentWidth, 8, 'F');
+    // Helper para dibujar secciones
+    const drawSectionHeader = (title) => {
+        doc.setFillColor(20, 40, 80);
+        doc.rect(margin, y, contentWidth, 7, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.setTextColor(139, 0, 0); // Rojo oscuro
-        doc.text(consulta.enfermedad_nombre.toUpperCase(), margin + 2, y + 3);
-        y += 10;
+        doc.setFontSize(10);
+        doc.setTextColor(255);
+        doc.text(title, margin + 3, y + 5);
+        y += 12;
+        doc.setTextColor(0);
+    };
+
+    const drawTwoColRow = (label1, val1, label2, val2) => {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(80);
+        doc.text(label1, margin + 2, y);
+        doc.text(label2, pageWidth / 2 + 5, y);
+
+        y += 5;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
+        doc.text(String(val1 || 'N/A'), margin + 2, y);
+
+        // Estatus color logic
+        if (label2.toLowerCase().includes('estatus')) {
+            const st = String(val2 || '').toLowerCase();
+            if (st === 'realizada') doc.setTextColor(0, 100, 0);
+            else if (st === 'pendiente') doc.setTextColor(200, 100, 0);
+            else if (st === 'cancelada') doc.setTextColor(150, 0, 0);
+        }
+        doc.text(String(val2 || 'N/A').toUpperCase(), pageWidth / 2 + 5, y);
+        doc.setTextColor(0);
+        y += 8;
+    };
+
+    // === SECCIÓN: INFORMACIÓN GENERAL ===
+    drawSectionHeader('I. INFORMACIÓN GENERAL DE LA ATENCIÓN');
+
+    const pNombre = `${consulta.paciente_nombre || ''} ${consulta.paciente_apellido || ''}`.toUpperCase();
+    const fAtencion = consulta.fecha_atencion_formatted ||
+        (consulta.fecha_atencion ? new Date(consulta.fecha_atencion).toLocaleString('es-VE') : 'N/A');
+
+    drawTwoColRow('PACIENTE:', pNombre, 'FECHA Y HORA:', fAtencion);
+    drawTwoColRow('CÉDULA:', consulta.paciente_cedula, 'ESTATUS:', consulta.estatus);
+
+    // === SECCIÓN: DIAGNÓSTICO Y TRATAMIENTO ===
+    if (y > pageHeight - 80) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+    drawSectionHeader('II. DIAGNÓSTICO Y PLAN TERAPÉUTICO');
+
+    if (consulta.enfermedad_nombre) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(150, 0, 0);
+        doc.text(`PATOLOGÍA PRIMARIA: ${consulta.enfermedad_nombre.toUpperCase()}`, margin + 2, y);
+        y += 8;
+        doc.setTextColor(0);
     }
 
-    // Diagnóstico detallado
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(80);
-    doc.text('Descripción del Diagnóstico:', margin + 2, y);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(80);
+    doc.text('DESCRIPCIÓN CLÍNICA:', margin + 2, y);
     y += 5;
-
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(0);
+    doc.setFont('times', 'normal'); doc.setFontSize(10); doc.setTextColor(0);
     const splitDiag = doc.splitTextToSize(consulta.diagnostico || 'No especificado', contentWidth - 4);
-    doc.text(splitDiag, margin + 2, y);
+    doc.text(splitDiag, margin + 4, y);
     y += (splitDiag.length * 5) + 8;
 
-    // === SECCIÓN: TRATAMIENTO ===
-    if (y > pageHeight - 80) { doc.addPage(); y = margin + 10; }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(80);
+    doc.text('TRATAMIENTO INDICADO:', margin + 2, y);
+    y += 5;
+    doc.setFont('times', 'normal'); doc.setFontSize(10); doc.setTextColor(0);
+    const splitTrat = doc.splitTextToSize(consulta.tratamientos || 'No especificado', contentWidth - 4);
+    doc.text(splitTrat, margin + 4, y);
+    y += (splitTrat.length * 5) + 10;
 
-    doc.setFillColor(0, 51, 160);
-    doc.rect(margin, y, contentWidth, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('TRATAMIENTO', margin + 2, y + 5);
-    y += 12;
-
-    doc.setFont('times', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(0);
-    const splitTratamiento = doc.splitTextToSize(consulta.tratamientos || 'No especificado', contentWidth - 4);
-    doc.text(splitTratamiento, margin + 2, y);
-    y += (splitTratamiento.length * 5) + 8;
-
-    // === SECCIÓN: MEDICAMENTOS PRESCRITOS (Tabla) ===
+    // === SECCIÓN: MEDICAMENTOS ===
     if (consulta.medicamentos && consulta.medicamentos.length > 0) {
-        if (y > pageHeight - 70) { doc.addPage(); y = margin + 10; }
+        if (y > pageHeight - 60) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+        drawSectionHeader('III. PRESCRIPCIÓN DE MEDICAMENTOS');
 
-        doc.setFillColor(0, 51, 160);
-        doc.rect(margin, y, contentWidth, 7, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(255, 255, 255);
-        doc.text('MEDICAMENTOS PRESCRITOS', margin + 2, y + 5);
-        y += 12;
-
-        // Encabezado de tabla
-        doc.setFillColor(220, 220, 220);
-        doc.rect(margin, y, contentWidth, 6, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
-        doc.setTextColor(0);
-        doc.text('#', margin + 2, y + 4);
-        doc.text('Medicamento', margin + 8, y + 4);
-        doc.text('Presentación', margin + 80, y + 4);
-        doc.text('Dosis', margin + 130, y + 4);
-        doc.text('Cant.', margin + 165, y + 4);
-        y += 8;
-
-        // Filas de medicamentos
-        consulta.medicamentos.forEach((med, idx) => {
-            if (y > pageHeight - 20) { doc.addPage(); y = margin + 10; }
-
-            // Fondo alternado
-            if (idx % 2 === 0) {
-                doc.setFillColor(250, 250, 250);
-                doc.rect(margin, y - 2, contentWidth, 6, 'F');
-            }
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(8);
-            doc.setTextColor(80);
-            doc.text(`${idx + 1}`, margin + 2, y + 2);
-
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(9);
-            doc.setTextColor(0);
-            doc.text(med.medicamento_nombre || 'N/A', margin + 8, y + 2);
-            doc.text(med.medicamento_presentacion || '-', margin + 80, y + 2);
-            doc.text(med.medicamentos_miligramos || '-', margin + 130, y + 2);
-            doc.text(String(med.cantidad_utilizada || '-'), margin + 165, y + 2);
-
-            y += 6;
+        autoTable(doc, {
+            head: [['#', 'Medicamento', 'Presentación', 'Dosis / Concentración', 'Cant.']],
+            body: consulta.medicamentos.map((m, idx) => [
+                idx + 1,
+                m.medicamento_nombre || 'N/A',
+                m.medicamento_presentacion || '-',
+                m.medicamentos_miligramos || '-',
+                m.cantidad_utilizada || '-'
+            ]),
+            startY: y,
+            theme: 'grid',
+            styles: { fontSize: 8, font: 'helvetica' },
+            headStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold' }
         });
-        y += 6;
+        y = doc.lastAutoTable.finalY + 12;
     }
 
-    // === SECCIÓN: OBSERVACIONES ===
+    // === OBSERVACIONES ===
     if (consulta.observaciones) {
-        if (y > pageHeight - 50) { doc.addPage(); y = margin + 10; }
-
-        doc.setFillColor(0, 51, 160);
-        doc.rect(margin, y, contentWidth, 7, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(255, 255, 255);
-        doc.text('OBSERVACIONES MÉDICAS', margin + 2, y + 5);
-        y += 12;
-
-        doc.setFont('times', 'italic');
-        doc.setFontSize(9);
-        doc.setTextColor(60);
+        if (y > pageHeight - 40) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+        drawSectionHeader('IV. OBSERVACIONES MÉDICAS ADICIONALES');
+        doc.setFont('times', 'italic'); doc.setFontSize(9); doc.setTextColor(60);
         const splitObs = doc.splitTextToSize(consulta.observaciones, contentWidth - 4);
-        doc.text(splitObs, margin + 2, y);
-        y += (splitObs.length * 5) + 8;
+        doc.text(splitObs, margin + 4, y);
+        y += (splitObs.length * 5) + 15;
     }
 
-    // === NOTA IMPORTANTE ===
-    if (y > pageHeight - 30) { doc.addPage(); y = margin + 10; }
+    // --- Nota de Importancia ---
+    if (y > pageHeight - 30) { doc.addPage(); y = margin + 10; doc.rect(5, 5, pageWidth - 10, pageHeight - 10); }
+    doc.setDrawColor(150, 0, 0);
+    doc.rect(margin, y, contentWidth, 12);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(150, 0, 0);
+    doc.text('AVISO:', margin + 2, y + 4);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(0);
+    doc.text('Este documento es un resumen clínico oficial. Siga las instrucciones del especialista.', margin + 2, y + 8);
 
-    doc.setDrawColor(200, 0, 0);
-    doc.setLineWidth(0.5);
-    doc.rect(margin, y, contentWidth, 15);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(200, 0, 0);
-    doc.text('IMPORTANTE:', margin + 2, y + 4);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(0);
-    const nota = 'Este documento es una constancia de consulta médica. Siga estrictamente las indicaciones del tratamiento prescrito. En caso de reacciones adversas o dudas, consulte inmediatamente con su médico tratante.';
-    const splitNota = doc.splitTextToSize(nota, contentWidth - 4);
-    doc.text(splitNota, margin + 2, y + 8);
-
-    // === Footer en todas las páginas ===
-    const totalPages = doc.internal.getNumberOfPages();
-    const fechaGeneracion = new Date().toLocaleDateString('es-VE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-
-    for (let i = 1; i <= totalPages; i++) {
+    // === Footer ===
+    const totalP = doc.internal.getNumberOfPages();
+    const fGen = new Date().toLocaleString('es-VE');
+    for (let i = 1; i <= totalP; i++) {
         doc.setPage(i);
-
-        // Línea superior del footer
-        doc.setDrawColor(200);
-        doc.setLineWidth(0.3);
-        doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(120);
-        doc.text(`Sistema Integral de Servicios Médicos Yutong • Generado: ${fechaGeneracion}`, margin, pageHeight - 8);
-        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 8, { align: 'right' });
-
-        // Código de consulta en footer
-        doc.setFontSize(6);
-        doc.text(`Consulta: ${codigoConsulta}`, pageWidth / 2, pageHeight - 15, { align: 'center' });
+        doc.setFontSize(7); doc.setTextColor(120);
+        doc.text(`Consulta Médica - Yutong Venezuela • Generado: ${fGen}`, margin, pageHeight - 8);
+        doc.text(`Página ${i} de ${totalP}`, pageWidth - margin, pageHeight - 8, { align: 'right' });
     }
 
     return doc.output('blob');
@@ -1346,257 +1061,154 @@ export function generateDoctorPDF(doctor) {
     // --- Configuración ---
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 20;
+    const margin = 15;
     const contentWidth = pageWidth - (margin * 2);
     let y = margin;
+
+    // --- Borde de Página (Fino y elegante) ---
+    doc.setDrawColor(44, 62, 80); // Azul oscuro grisáceo
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
 
     // --- Header (Cintillo) ---
     try {
         const imgWidth = contentWidth;
-        const imgHeight = 25;
+        const imgHeight = 22;
         doc.addImage(cintillo, 'PNG', margin, y, imgWidth, imgHeight);
-        y += imgHeight + 12;
+        y += imgHeight + 10;
     } catch (e) {
-        console.error("Error cargando cintillo", e);
-        y += 30;
+        y += 20;
     }
 
-    // --- Línea decorativa superior ---
-    doc.setDrawColor(0, 51, 160);
-    doc.setLineWidth(1);
+    // --- Línea separadora decorativa ---
+    doc.setDrawColor(20, 40, 80);
+    doc.setLineWidth(0.8);
     doc.line(margin, y, pageWidth - margin, y);
-    y += 2;
-    doc.setLineWidth(0.3);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 15;
+    y += 12;
 
     // --- Título Principal ---
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(24);
-    doc.setTextColor(0, 51, 160);
-    doc.text('FICHA PROFESIONAL', pageWidth / 2, y, { align: 'center' });
-    y += 8;
-
-    doc.setFontSize(11);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(20, 40, 80);
+    doc.text('FICHA DE REGISTRO PROFESIONAL', pageWidth / 2, y, { align: 'center' });
+    y += 6;
+    doc.setFontSize(10);
+    doc.setFont('times', 'italic');
     doc.setTextColor(100);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Personal Médico y Técnico', pageWidth / 2, y, { align: 'center' });
-    y += 18;
+    doc.text('Dirección de Salud y Seguridad Laboral - Yutong Venezuela S.A.', pageWidth / 2, y, { align: 'center' });
+    y += 15;
 
-    // --- SECCIÓN: DATOS PERSONALES ---
-    // Título de sección con fondo
-    doc.setFillColor(0, 51, 160);
-    doc.rect(margin, y, contentWidth, 8, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255);
-    doc.text('DATOS PERSONALES', margin + 3, y + 5.5);
-    y += 12;
-
-    // Contenedor de datos personales con borde
-    const datosBoxHeight = 40;
-    doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.5);
-    doc.setFillColor(250, 250, 250);
-    doc.roundedRect(margin, y, contentWidth, datosBoxHeight, 2, 2, 'FD');
-
-    // Grid de datos personales
-    const leftCol = margin + 8;
-    const rightCol = pageWidth / 2 + 8;
-    const labelWidth = 28;
-    let dataY = y + 10;
-
+    // === SECCIÓN 1: IDENTIFICACIÓN DEL PROFESIONAL ===
+    doc.setFillColor(20, 40, 80);
+    doc.rect(margin, y, contentWidth, 7, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.setTextColor(60, 60, 60);
-
-    // Columna izquierda
-    doc.text('Cédula:', leftCol, dataY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text(doctor.cedula || 'N/A', leftCol + labelWidth, dataY);
-
-    dataY += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60, 60, 60);
-    doc.text('Nombre Completo:', leftCol, dataY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    const nombreCompleto = `${doctor.nombre || ''} ${doctor.apellido || ''}`.trim();
-    doc.text(nombreCompleto || 'N/A', leftCol + labelWidth, dataY);
-
-    dataY += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60, 60, 60);
-    doc.text('Teléfono:', leftCol, dataY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text(doctor.contacto || 'N/A', leftCol + labelWidth, dataY);
-
-    // Columna derecha
-    dataY = y + 10;
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60, 60, 60);
-    doc.text('Cargo:', rightCol, dataY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text(doctor.cargo_nombre || 'N/A', rightCol + labelWidth, dataY);
-
-    dataY += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60, 60, 60);
-    doc.text('Profesión:', rightCol, dataY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text(doctor.profesion_carrera || 'N/A', rightCol + labelWidth, dataY);
-
-    dataY += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60, 60, 60);
-    doc.text('Nivel Académico:', rightCol, dataY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text(doctor.profesion_nivel || 'N/A', rightCol + labelWidth, dataY);
-
-    y += datosBoxHeight + 15;
-
-    // --- SECCIÓN: ESTADO LABORAL ---
-    doc.setFillColor(0, 51, 160);
-    doc.rect(margin, y, contentWidth, 8, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255);
-    doc.text('ESTADO LABORAL', margin + 3, y + 5.5);
+    doc.setTextColor(255);
+    doc.text('I. IDENTIFICACIÓN Y DATOS DE CONTACTO', margin + 3, y + 5);
     y += 12;
 
-    const estadoBoxHeight = 18;
-    const estadoActivo = doctor.estado === true || doctor.estado === 'true';
+    doc.setTextColor(0);
+    doc.setFontSize(10);
 
-    // Contenedor del estado
-    doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.5);
-    doc.setFillColor(250, 250, 250);
-    doc.roundedRect(margin, y, contentWidth, estadoBoxHeight, 2, 2, 'FD');
+    // Tabla de Datos Personales
+    const colLabels = margin + 2;
+    const colValues = margin + 45;
+    const rowHeight = 7;
 
-    // Badge de estado centrado
-    const badgeWidth = 80;
-    const badgeHeight = 10;
-    const badgeX = (pageWidth - badgeWidth) / 2;
-    const badgeY = y + 4;
+    const drawRow = (label, value) => {
+        doc.setFont('helvetica', 'bold');
+        doc.text(label, colLabels, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(String(value || 'N/A'), colValues, y);
+        y += rowHeight;
+    };
 
-    if (estadoActivo) {
-        doc.setFillColor(34, 197, 94);
-        doc.setDrawColor(34, 197, 94);
+    drawRow('Cédula de Identidad:', doctor.cedula);
+    drawRow('Apellidos y Nombres:', `${doctor.nombre || ''} ${doctor.apellido || ''}`.trim());
+    drawRow('Teléfono de Contacto:', doctor.contacto);
+    drawRow('Correo Electrónico:', doctor.correo || 'No registrado');
+    y += 5;
+
+    // === SECCIÓN 2: INFORMACIÓN LABORAL Y ACADÉMICA ===
+    doc.setFillColor(20, 40, 80);
+    doc.rect(margin, y, contentWidth, 7, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255);
+    doc.text('II. PERFIL PROFESIONAL Y CARGO', margin + 3, y + 5);
+    y += 12;
+
+    doc.setTextColor(0);
+    drawRow('Cargo Actual:', doctor.cargo_nombre);
+    drawRow('Profesión / Área:', doctor.profesion_carrera);
+    drawRow('Nivel Académico:', doctor.profesion_nivel);
+
+    // Situación Administrativa (Estado)
+    y += 3;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Estatus Administrativo:', colLabels, y);
+    const activo = doctor.estado === true || doctor.estado === 'true';
+    doc.setFont('helvetica', 'bold');
+    if (activo) {
+        doc.setTextColor(0, 100, 0); // Verde oscuro formal
+        doc.text('VIGENTE / ACTIVO', colValues, y);
     } else {
-        doc.setFillColor(239, 68, 68);
-        doc.setDrawColor(239, 68, 68);
+        doc.setTextColor(150, 0, 0); // Rojo oscuro formal
+        doc.text('NO VIGENTE / INACTIVO', colValues, y);
     }
+    doc.setTextColor(0);
+    y += 15;
 
-    doc.setLineWidth(0.8);
-    doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 2, 2, 'FD');
+    // === SECCIÓN 3: HISTORIAL DE REGISTRO ===
+    doc.setFillColor(20, 40, 80);
+    doc.rect(margin, y, contentWidth, 7, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255);
+    doc.text('III. TRAZABILIDAD DEL REGISTRO', margin + 3, y + 5);
+    y += 12;
+
+    doc.setTextColor(0);
+    const formatDate = (date) => date ? new Date(date).toLocaleString('es-VE', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : 'N/A';
+
+    drawRow('Fecha de Inscripción:', formatDate(doctor.created_at));
+    drawRow('Última Sincronización:', formatDate(doctor.updated_at));
+
+    y += 15;
+
+    // --- Bloque de Validez ---
+    doc.setFont('times', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(80);
+    const legalText = "La presente ficha profesional es un documento de uso interno de Yutong Venezuela S.A. La veracidad de la información contenida en este registro ha sido validada por el departamento de recursos humanos y el servicio médico correspondiente.";
+    const splitLegal = doc.splitTextToSize(legalText, contentWidth - 40);
+    doc.text(splitLegal, pageWidth / 2, y + 5, { align: 'center' });
+
+    // --- Firmas ---
+    y = pageHeight - 30;
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.5);
+    doc.line(margin + 10, y, margin + 60, y);
+    doc.line(pageWidth - margin - 60, y, pageWidth - margin - 10, y);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(255, 255, 255);
-    doc.text(estadoActivo ? 'ACTIVO' : 'INACTIVO', pageWidth / 2, badgeY + 7, { align: 'center' });
+    doc.setFontSize(8);
+    doc.text('FIRMA DEL PROFESIONAL', margin + 35, y + 5, { align: 'center' });
+    doc.text('SELLO Y FIRMA AUTORIZADA', pageWidth - margin - 35, y + 5, { align: 'center' });
 
-    y += estadoBoxHeight + 15;
-
-    // --- SECCIÓN: INFORMACIÓN DEL REGISTRO ---
-    if (doctor.created_at || doctor.updated_at) {
-        doc.setFillColor(0, 51, 160);
-        doc.rect(margin, y, contentWidth, 8, 'F');
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.setTextColor(255, 255, 255);
-        doc.text('INFORMACIÓN DEL REGISTRO', margin + 3, y + 5.5);
-        y += 12;
-
-        const registroBoxHeight = 22;
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.5);
-        doc.setFillColor(250, 250, 250);
-        doc.roundedRect(margin, y, contentWidth, registroBoxHeight, 2, 2, 'FD');
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(0, 0, 0);
-
-        let registroY = y + 8;
-
-        if (doctor.created_at) {
-            const fechaCreacion = new Date(doctor.created_at).toLocaleDateString('es-VE', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(60, 60, 60);
-            doc.text('Fecha de Registro:', leftCol, registroY);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(0, 0, 0);
-            doc.text(fechaCreacion, leftCol + 38, registroY);
-        }
-
-        if (doctor.updated_at) {
-            const fechaActualizacion = new Date(doctor.updated_at).toLocaleDateString('es-VE', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            registroY += 7;
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(60, 60, 60);
-            doc.text('Última Actualización:', leftCol, registroY);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(0, 0, 0);
-            doc.text(fechaActualizacion, leftCol + 38, registroY);
-        }
-
-
-        y += registroBoxHeight + 10;
-    }
-
-    // --- Footer Profesional ---
-    const footerY = pageHeight - 25;
-
-    // Línea decorativa del footer
-    doc.setDrawColor(0, 51, 160);
-    doc.setLineWidth(0.3);
-    doc.line(margin, footerY, pageWidth - margin, footerY);
-    doc.setLineWidth(1);
-    doc.line(margin, footerY + 2, pageWidth - margin, footerY + 2);
-
-    const fechaGeneracion = new Date().toLocaleDateString('es-VE', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    // --- Footer ---
+    const footerY = pageHeight - 12;
+    doc.setDrawColor(20, 40, 80);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY - 2, pageWidth - margin, footerY - 2);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(80, 80, 80);
-    doc.text('Sistema Integral de Servicios Médicos Yutong', margin, footerY + 8);
-    doc.text(`Generado: ${fechaGeneracion}`, pageWidth - margin, footerY + 8, { align: 'right' });
-
     doc.setFontSize(7);
-    doc.setTextColor(120, 120, 120);
-    doc.text('Documento Confidencial - Uso Interno', pageWidth / 2, footerY + 12, { align: 'center' });
-
-    // Código de referencia
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.setTextColor(0, 51, 160);
-    doc.text(`Ref: DOC-${doctor.cedula || 'N/A'}`, pageWidth / 2, footerY + 17, { align: 'center' });
+    doc.setTextColor(120);
+    const fechaGen = new Date().toLocaleString('es-VE');
+    doc.text(`Expediente Digital: ${doctor.cedula || 'N/A'}`, margin, footerY + 3);
+    doc.text(`Página 1 de 1`, pageWidth / 2, footerY + 3, { align: 'center' });
+    doc.text(`Generado el: ${fechaGen}`, pageWidth - margin, footerY + 3, { align: 'right' });
 
     return doc.output('blob');
 }
@@ -1621,11 +1233,16 @@ export function generateHistorialMedicamentosPDF({ paciente, medicamentos }) {
     }
 
     // Título
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(16);
-    doc.setTextColor(0, 51, 160);
+    doc.setTextColor(20, 40, 80);
     doc.text('HISTORIAL DE MEDICAMENTOS SUMINISTRADOS', pageWidth / 2, y, { align: 'center' });
     y += 10;
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
 
     // Datos Paciente
     doc.setFont('helvetica', 'bold');
@@ -1659,7 +1276,7 @@ export function generateHistorialMedicamentosPDF({ paciente, medicamentos }) {
         head: [columns.map(c => c.header)],
         body: body.map(row => columns.map(c => row[c.dataKey])),
         theme: 'grid',
-        headStyles: { fillColor: [0, 51, 160], textColor: 255 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255 },
         styles: { fontSize: 9 },
         margin: { left: margin, right: margin }
     });
@@ -1693,11 +1310,16 @@ export function generateInventarioPDF(medicamentos) {
     } catch (e) { y += 20; }
 
     // Título
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(16);
-    doc.setTextColor(0, 51, 160);
+    doc.setTextColor(20, 40, 80);
     doc.text('REPORTE DE INVENTARIO ACTUAL - FARMACIA', pageWidth / 2, y, { align: 'center' });
     y += 8;
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Fecha de Emisión: ${new Date().toLocaleString('es-VE')}`, pageWidth / 2, y, { align: 'center' });
@@ -1724,7 +1346,7 @@ export function generateInventarioPDF(medicamentos) {
         head: [columns.map(c => c.header)],
         body: body.map(row => columns.map(c => row[c.dataKey])),
         theme: 'grid',
-        headStyles: { fillColor: [0, 51, 160], textColor: 255, fontSize: 10 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255, fontSize: 10 },
         styles: { fontSize: 9 },
         didDrawCell: (data) => {
             if (data.section === 'body' && data.column.index === 4) {
@@ -1755,11 +1377,16 @@ export function generateKardexPDF(movimientos) {
     } catch (e) { y += 20; }
 
     // Título
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('times', 'bold');
     doc.setFontSize(16);
-    doc.setTextColor(0, 51, 160);
+    doc.setTextColor(20, 40, 80);
     doc.text('KÁRDEX DE MOVIMIENTOS DE INVENTARIO', pageWidth / 2, y, { align: 'center' });
     y += 8;
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Generado: ${new Date().toLocaleString('es-VE')}`, pageWidth / 2, y, { align: 'center' });
@@ -1777,7 +1404,7 @@ export function generateKardexPDF(movimientos) {
             m.motivo || '-'
         ]),
         theme: 'striped',
-        headStyles: { fillColor: [0, 51, 160], textColor: 255 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255 },
         styles: { fontSize: 8 },
         didDrawCell: (data) => {
             if (data.section === 'body' && data.column.index === 1) {
@@ -1796,6 +1423,7 @@ export function generateEpidemiologicoPDF(data) {
     const { patologias, totalConsultas, periodo } = data;
     const doc = new jsPDF({ format: 'letter', unit: 'mm' });
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
     let y = margin;
 
@@ -1806,11 +1434,17 @@ export function generateEpidemiologicoPDF(data) {
     } catch (e) { y += 20; }
 
     // Título
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(0, 51, 160);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(20, 40, 80);
     doc.text('REPORTE EPIDEMIOLÓGICO DE MORBILIDAD', pageWidth / 2, y, { align: 'center' });
     y += 8;
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Periodo: ${periodo || 'Histórico General'}`, pageWidth / 2, y, { align: 'center' });
@@ -1835,7 +1469,7 @@ export function generateEpidemiologicoPDF(data) {
             `${((p.cantidad / totalConsultas) * 100).toFixed(2)}%`
         ]),
         theme: 'grid',
-        headStyles: { fillColor: [0, 51, 160], textColor: 255 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255 },
         columnStyles: {
             0: { cellWidth: 10 },
             1: { cellWidth: 100 },
@@ -1853,6 +1487,7 @@ export function generateAusentismoPDF(data) {
     const { departamentos, totalDiasGlobal, periodo } = data;
     const doc = new jsPDF({ format: 'letter', unit: 'mm' });
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
     let y = margin;
 
@@ -1863,11 +1498,17 @@ export function generateAusentismoPDF(data) {
     } catch (e) { y += 20; }
 
     // Título
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(0, 51, 160);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(20, 40, 80);
     doc.text('REPORTE DE AUSENTISMO LABORAL (REPOSOS)', pageWidth / 2, y, { align: 'center' });
     y += 8;
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Análisis por Departamento - Periodo: ${periodo || 'Todo'}`, pageWidth / 2, y, { align: 'center' });
@@ -1883,7 +1524,7 @@ export function generateAusentismoPDF(data) {
             `${((d.total_dias / totalDiasGlobal) * 100).toFixed(2)}%`
         ]),
         theme: 'striped',
-        headStyles: { fillColor: [180, 0, 0], textColor: 255 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255 },
         styles: { fontSize: 9 },
         margin: { left: margin, right: margin }
     });
@@ -1896,6 +1537,7 @@ export function generateProductividadPDF(data) {
     const { doctores, periodo } = data;
     const doc = new jsPDF({ format: 'letter', unit: 'mm' });
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
     let y = margin;
 
@@ -1906,11 +1548,17 @@ export function generateProductividadPDF(data) {
     } catch (e) { y += 25; }
 
     // Título
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(0, 51, 160);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(20, 40, 80);
     doc.text('REPORTE DE PRODUCTIVIDAD Y EFICIENCIA MÉDICA', pageWidth / 2, y, { align: 'center' });
     y += 8;
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Periodo: ${periodo || 'Histórico'}`, pageWidth / 2, y, { align: 'center' });
@@ -1927,7 +1575,7 @@ export function generateProductividadPDF(data) {
             `${((d.total_realizadas / (d.total_programadas || 1)) * 100).toFixed(1)}%`
         ]),
         theme: 'grid',
-        headStyles: { fillColor: [0, 102, 204], textColor: 255 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255 },
         styles: { fontSize: 8 },
         margin: { left: margin, right: margin }
     });
@@ -1939,14 +1587,20 @@ export function generateProductividadPDF(data) {
 export function generateAuditoriaPDF(registros) {
     const doc = new jsPDF({ format: 'letter', orientation: 'landscape', unit: 'mm' });
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 10;
     let y = margin;
 
     // Header simple para landscape
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(0, 51, 160);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(20, 40, 80);
     doc.text('REPORTE DE AUDITORÍA DE SISTEMA (BITÁCORA)', margin, y + 10);
+
+    // Borde de Página
+    doc.setDrawColor(44, 62, 80);
+    doc.setLineWidth(0.1);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
     doc.setFontSize(8);
     doc.setTextColor(100);
     doc.text(`Fecha de Reporte: ${new Date().toLocaleString('es-VE')}`, margin, y + 15);
@@ -1963,7 +1617,7 @@ export function generateAuditoriaPDF(registros) {
             r.descripcion
         ]),
         theme: 'striped',
-        headStyles: { fillColor: [50, 50, 50], textColor: 255 },
+        headStyles: { fillColor: [20, 40, 80], textColor: 255 },
         styles: { fontSize: 7, overflow: 'linebreak' },
         columnStyles: {
             0: { cellWidth: 35 },

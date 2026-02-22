@@ -18,7 +18,7 @@ function SeccionOne() {
 
   const tabs = useMemo(() => {
     const t = [
-      tienePermiso("doctores", "ver") && { key: "doctores", label: "Doctores" },
+      tienePermiso("doctores", "ver") && { key: "doctores", label: "Personal" },
       tienePermiso("usuarios", "ver") && { key: "usuarios", label: "Usuarios" },
       tienePermiso("roles", "ver") && { key: "roles", label: "Seguridad y Roles" },
       tienePermiso("cargos", "ver") && { key: "cargos", label: "Cargos" },

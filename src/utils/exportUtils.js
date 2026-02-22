@@ -49,48 +49,44 @@ export function exportToPDF({
 
     // Configura alturas/posiciones del header y tabla
     const CINTILLO_Y = 6;
-    const CINTILLO_HEIGHT = 15;     // más flaco
-    const TITLE_Y = 30;
+    const CINTILLO_HEIGHT = 20;     // más flaco
+    const TITLE_Y = 35;
     const TABLE_START_Y = 40;       // más espacio antes de la tabla
 
-    // Cabecera: cintillo + título
+    // Cabecera: cintillo + título + borde
     const drawHeader = () => {
+        // Borde de página (Estandarizado)
+        doc.setDrawColor(44, 62, 80);
+        doc.setLineWidth(0.1);
+        doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
         try {
             const w = pageWidth - (margin.left + margin.right);
             doc.addImage(cintillo, 'PNG', margin.left, CINTILLO_Y, w, CINTILLO_HEIGHT);
         } catch (e) { e }
-        doc.setTextColor(40, 40, 40);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(15);
+
+        doc.setTextColor(20, 40, 80);
+        doc.setFont('times', 'bold');
+        doc.setFontSize(16);
         if (title) {
             doc.text(String(title).toUpperCase(), pageWidth / 2, TITLE_Y, { align: 'center' });
         }
     };
 
-    // Pie de página: logo sicic más pequeño + texto centrado
+    // Pie de página: Estandarizado corporativo
     const drawFooter = () => {
         const now = new Date();
         const dateTime = now.toLocaleString('es-VE', { dateStyle: 'short', timeStyle: 'short' });
-        const text = `Cuidarte Yutong ${dateTime}`;
-        const footFont = 8;
+        const text = `Sistema Integral de Servicios Médicos Yutong • Generado: ${dateTime}`;
 
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(footFont);
+        doc.setFontSize(7);
+        doc.setTextColor(120);
+        doc.text(text, margin.left, pageHeight - 8);
 
-        const textWidth = doc.getTextWidth(text);
-        const imgW = 7;
-        // const imgH = 7;
-        const gap = 2;
-        const totalW = imgW + gap + textWidth;
-
-        const x = (pageWidth - totalW) / 2;
-        const y = pageHeight - 6;
-
-        try {
-            // doc.addImage(sisic, 'PNG', x, y - imgH + 2.5, imgW, imgH);
-        } catch (e) { e }
-
-        doc.text(text, x + imgW + gap, y);
+        const pageCount = doc.internal.getNumberOfPages();
+        const currPage = doc.internal.getCurrentPageInfo().pageNumber;
+        doc.text(`Página ${currPage} de ${pageCount}`, pageWidth - margin.right, pageHeight - 8, { align: 'right' });
     };
 
     // Dibuja cabecera inicial
@@ -100,18 +96,18 @@ export function exportToPDF({
     const tableRows = rows.map(row => row.map(v => v == null ? '' : String(v)));
 
     const baseFont = 10;
-    const fontSize = Math.max(6, baseFont - Math.floor((columns.length - 4) / 2));
+    const fontSize = Math.max(7, baseFont - Math.floor((columns.length - 4) / 1.5));
 
     const minColW = 10;
-    const maxColW = useLandscape ? 60 : 40;
+    const maxColW = useLandscape ? 80 : 50;
     const rawLens = columns.map((col, i) => {
         const headerLen = String(col.header || '').length;
         const maxCellLen = tableRows.reduce((m, r) => Math.max(m, (r[i] || '').length), 0);
         return Math.max(headerLen, maxCellLen);
     });
     const keyWeight = (k) => {
-        if (k === 'email') return 1.6;
-        if (k === 'descripcion' || k === 'ubicacion') return 1.3;
+        if (k === 'email' || k === 'departamento') return 1.6;
+        if (k === 'descripcion' || k === 'ubicacion' || k === 'nombre') return 1.4;
         if (k === 'codigo' || k === 'cedula' || k === 'rif') return 1.15;
         return 1;
     };
@@ -139,7 +135,7 @@ export function exportToPDF({
         columnStyles[idx] = {
             cellWidth: widths[idx],
             overflow: 'linebreak',
-            halign: col.key === 'codigo' ? 'center' : 'left'
+            halign: ['codigo', 'cedula', 'rif', 'fecha', 'monto'].includes(col.key) ? 'center' : 'left'
         };
     });
 
@@ -158,32 +154,29 @@ export function exportToPDF({
         styles: {
             font: 'helvetica',
             fontSize,
-            cellPadding: 2,
+            cellPadding: 1.5,
             overflow: 'linebreak',
             cellWidth: 'wrap',
             halign: 'left',
             valign: 'middle',
             lineWidth: 0.1,
-            lineColor: [200, 200, 200], // Bordes gris claro
-            textColor: [40, 40, 40],    // Texto gris oscuro
-            fillColor: [255, 255, 255], // Fondo blanco por defecto
+            lineColor: [220, 220, 220],
+            textColor: [50, 50, 50],
         },
         headStyles: {
             fontStyle: 'bold',
-            fontSize: Math.min(12, fontSize + 1),
-            fillColor: [0, 101, 160],
+            fontSize: Math.min(10, fontSize + 1),
+            fillColor: [20, 40, 80], // Azul oscuro corporativo
             textColor: 255,
             halign: 'center',
-            lineWidth: 0.15,
+            lineWidth: 0.1,
             lineColor: [200, 200, 200]
         },
         bodyStyles: {
-            lineWidth: 0.1,
-            lineColor: [200, 200, 200],
-            fillColor: [255, 255, 255], // Fondo blanco
-            textColor: [40, 40, 40]
+            lineWidth: 0.05,
+            lineColor: [230, 230, 230],
         },
-        alternateRowStyles: { fillColor: [230, 240, 250] },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
         columnStyles,
         didParseCell: (data) => {
             const { cell, column, section } = data;
@@ -191,7 +184,7 @@ export function exportToPDF({
             const idx = column.index;
             const content = Array.isArray(cell.text) ? cell.text.join(' ') : String(cell.text || '');
             let fs = fontSize;
-            const maxW = Math.max(6, widths[idx] - 2 * 2);
+            const maxW = Math.max(5, widths[idx] - 3);
             let w = measure(content, fs);
             while (w > maxW && fs > 6) {
                 fs -= 0.5;

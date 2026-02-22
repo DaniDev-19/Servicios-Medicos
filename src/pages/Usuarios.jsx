@@ -147,6 +147,15 @@ function Usuarios() {
               Eliminar
             </button>
           )}
+          {tienePermiso('usuarios', 'editar') && (
+            <button
+              className={`btn btn-xs btn-outline ${row.estado ? 'btn-warning' : 'btn-success'}`}
+              title={row.estado ? "Deshabilitar Usuario" : "Habilitar Usuario"}
+              onClick={() => handleToggleEstado(row.id)}
+            >
+              {row.estado ? "Deshabilitar" : "Habilitar"}
+            </button>
+          )}
         </div>
       )
     }
@@ -194,6 +203,20 @@ function Usuarios() {
     } catch (error) {
       console.error("Error eliminando usuario:", error?.response?.data || error.message);
       showToast?.("Error al eliminar el usuario", "error", 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleEstado = async (id) => {
+    setLoading(true);
+    try {
+      await api.patch(`usuarios/toggle-estado/${id}`);
+      showToast?.("Estado del usuario actualizado", "success", 3000);
+      await fetchUsuarios();
+    } catch (error) {
+      console.error("Error al cambiar estado del usuario:", error?.response?.data || error.message);
+      showToast?.("Error al cambiar el estado", "error", 3000);
     } finally {
       setLoading(false);
     }

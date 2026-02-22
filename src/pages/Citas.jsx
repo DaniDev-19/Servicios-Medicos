@@ -287,8 +287,32 @@ function Citas() {
                 />
             </FormModal>
 
-            <FormModal isOpen={!!pdfUrl} onClose={() => setPdfUrl(null)} title="Vista Previa PDF">
-                {pdfUrl && <iframe src={pdfUrl} style={{ width: "100%", height: "70vh", border: "none" }} />}
+            <FormModal
+                isOpen={!!pdfUrl}
+                onClose={() => {
+                    setPdfUrl(null);
+                    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+                }}
+                title="Vista previa PDF"
+                size="pdf"
+            >
+                {pdfUrl && (
+                    <iframe
+                        src={pdfUrl}
+                        title="Vista previa PDF"
+                        style={{ width: "100%", height: "85vh", border: "none" }}
+                    />
+                )}
+                <div style={{ marginTop: 16, textAlign: "right" }}>
+                    <a
+                        href={pdfUrl}
+                        download="agenda_citas.pdf"
+                        className="btn btn-primary"
+                        style={{ textDecoration: "none" }}
+                    >
+                        Descargar PDF
+                    </a>
+                </div>
             </FormModal>
 
             <ConfirmModal

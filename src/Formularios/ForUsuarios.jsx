@@ -5,6 +5,7 @@ import Spinner from "../components/spinner";
 import { useToast } from "../components/userToasd";
 import SingleSelect from "../components/SingleSelect";
 import { validateField, getValidationRule } from "../utils/validation";
+import icon from "../components/icon";
 
 function ForUsuarios({ initialData = {}, onSave, onClose }) {
   const showToast = useToast();
@@ -14,6 +15,8 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
   const [roles, setRoles] = useState([]);
   const [doctores, setDoctores] = useState([]);
   const [errors, setErrors] = useState({});
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
 
   const [form, setForm] = useState(() => ({
     username: initialData?.username || "",
@@ -30,8 +33,8 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
     setForm({
       username: initialData?.username || "",
       correo: initialData?.correo || "",
-      password: initialData?.password || "",
-      confirmPassword: initialData?.password || "",
+      password: "", // Siempre vacío al editar para no mostrar el hash
+      confirmPassword: "",
       roles_id: initialData?.roles_id || initialData?.rol_id || "",
       doctor_id: initialData?.doctor_id || "",
       estatus: initialData?.estatus || "activo",
@@ -63,11 +66,20 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
 
   // Validación de campos
   const validate = (field, value) => {
+
+    if (isEdit && (field === "password" || field === "confirmPassword") && !value) {
+      return "";
+    }
+
     if (field === "confirmPassword") {
       return value !== form.password ? "Las contraseñas no coinciden" : "";
     }
+
     const rule = getValidationRule(field);
     if (rule && rule.regex) {
+
+      if (!rule.required && !value) return "";
+
       const result = validateField(value, { text: v => rule.regex.test(v) }, rule.errorMessage);
       return result.valid ? "" : result.message;
     }
@@ -89,11 +101,13 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
 
   const validateAll = () => {
     const newErrors = {};
-    Object.keys(form).forEach((field) => {
-      if (field === "estado") return;
+    const fieldsToValidate = ["username", "correo", "roles_id", "doctor_id", "password", "confirmPassword"];
+
+    fieldsToValidate.forEach((field) => {
       const err = validate(field, form[field]);
       if (err) newErrors[field] = err;
     });
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -184,43 +198,73 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
 
         <div className="fc-field">
           <label><span className="unique">*</span>Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            required={!isEdit}
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPass ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder={isEdit ? "Dejar en blanco para conservar" : "••••••••"}
+              required={!isEdit}
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <img
+                src={showPass ? icon.ojito : icon.ojitoculto}
+                alt="toggle password"
+                style={{ width: '20px', height: '20px' }}
+              />
+            </button>
+          </div>
           {errors.password && <span style={{ color: 'red' }}>{errors.password}</span>}
         </div>
 
         <div className="fc-field">
           <label>Confirmar contraseña</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            placeholder="Repite la nueva contraseña"
-            required={!!form.password}
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showConfirmPass ? "text" : "password"}
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="Repite la contraseña"
+              required={!!form.password}
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPass(!showConfirmPass)}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <img
+                src={showConfirmPass ? icon.ojito : icon.ojitoculto}
+                alt="toggle password"
+                style={{ width: '20px', height: '20px' }}
+              />
+            </button>
+          </div>
           {errors.confirmPassword && <span style={{ color: 'red' }}>{errors.confirmPassword}</span>}
         </div>
-
-
-
-        {/* <div className="fc-field">
-            <label>Nueva contraseña (opcional)</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Dejar en blanco para conservar"
-            />
-            {errors.password && <span style={{color: 'red'}}>{errors.password}</span>}
-          </div> */}
 
 
         <div className="fc-field">
@@ -252,29 +296,6 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
           />
         </div>
 
-        {/* <div className="fc-field">
-          <label><span className='unique'>*</span>Estatus</label>
-          <SingleSelect
-            options={[
-              { value: "activo", label: "Activo" },
-              { value: "inactivo", label: "Inactivo" }
-            ]}
-            value={{ value: form.estatus, label: (form.estatus || "activo")[0].toUpperCase() + (form.estatus || "activo").slice(1) }}
-            onChange={(opt) => setForm((p) => ({ ...p, estatus: opt ? opt.value : "activo" }))}
-            isClearable={false}
-          />
-        </div> */}
-
-        {/* <div className="fc-field" style={{ display: "flex", alignItems: "flex-end" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <input
-              type="checkbox"
-              checked={!!form.estado}
-              onChange={(e) => setForm((p) => ({ ...p, estado: e.target.checked }))}
-            />
-            Activo en el sistema
-          </label>
-        </div> */}
       </div>
 
       <div className="forc-actions" style={{ marginTop: 24, marginBottom: 12 }}>
