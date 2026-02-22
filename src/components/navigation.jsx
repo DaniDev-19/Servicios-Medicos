@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '../styles/navigate.module.css';
 import icon from '../components/icon';
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import NotificacionesPanel from './NotificacionesPanel';
 
@@ -17,14 +16,10 @@ function Header() {
   const [notificaciones, setNotificaciones] = useState([]);
   const [activeTab, setActiveTab] = useState("todos");
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const fetchNotificaciones = async () => {
     try {
-      const response = await axios.get(`${BaseUrl}notificaciones`, { headers: getAuthHeaders() });
+      const response = await api.get('notificaciones');
       setNotificaciones(response.data);
     } catch (error) {
       console.error("Error cargando notificaciones", error);
@@ -41,7 +36,7 @@ function Header() {
   const handleMarcarLeida = async (notificacion) => {
     if (notificacion.leida) return;
     try {
-      await axios.put(`${BaseUrl}notificaciones/marcar-leida/${notificacion.id}`, {}, { headers: getAuthHeaders() });
+      await api.put(`notificaciones/marcar-leida/${notificacion.id}`, {});
       // Actualizar estado local
       setNotificaciones(prev => prev.map(n =>
         n.id === notificacion.id ? { ...n, leida: true } : n
@@ -55,12 +50,7 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (token) {
-        await axios.post(`${BaseUrl}auth/logout`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      }
+      await api.post('auth/logout', {});
       showToast?.("Sesión cerrada exitosamente", "success");
     } catch (error) {
       console.error('Error al Salir de la Sesión', error);
@@ -92,6 +82,7 @@ function Header() {
     '/admin/Atenciones': 'Atenciones',
     '/admin/Profesiones': 'Profesiones',
     '/admin/ForProfesiones': 'Nueva Profesión',
+    '/admin/Valoracion': 'Valoración del Proyecto',
   };
 
   const Pantalla = routeToTitle[location.pathname] || 'Cuidarte Yutong';
@@ -108,6 +99,14 @@ function Header() {
       </div>
 
       <div className={styles['navigate-options']}>
+        <button
+          className={styles.btnicon}
+          title='Valorar Proyecto'
+          onClick={() => navigate('/admin/Valoracion')}
+        >
+          <img src={icon.pulso2} alt="Valorar" className={styles.icon} />
+        </button>
+
         <button
           className={styles.btnicon}
           title='Notificaciones'

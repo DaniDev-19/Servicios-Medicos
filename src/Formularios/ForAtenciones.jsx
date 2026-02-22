@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import SingleSelect from "../components/SingleSelect";
@@ -26,8 +25,7 @@ function ForAtenciones({ onSuccess, onCancel, atencionToEdit = null }) {
         // Cargar pacientes para autocompletar si es necesario
         const fetchPatients = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await axios.get(`${BaseUrl}historias_medicas/pacientes-lista`, { headers: { Authorization: `Bearer ${token}` } });
+                const response = await api.get('historias_medicas/pacientes-lista');
                 if (Array.isArray(response.data)) {
                     setPatients(response.data.map(p => ({
                         value: p.id,
@@ -92,14 +90,10 @@ function ForAtenciones({ onSuccess, onCancel, atencionToEdit = null }) {
             const dataToSend = { ...formData, usuarios_id };
 
             if (atencionToEdit) {
-                await axios.put(`${BaseUrl}atenciones/actualizar/${atencionToEdit.id}`, dataToSend, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await api.put(`atenciones/actualizar/${atencionToEdit.id}`, dataToSend);
                 showToast("Atención actualizada", "success");
             } else {
-                await axios.post(`${BaseUrl}atenciones/registrar`, dataToSend, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await api.post('atenciones/registrar', dataToSend);
                 showToast("Atención registrada", "success");
             }
             onSuccess?.();

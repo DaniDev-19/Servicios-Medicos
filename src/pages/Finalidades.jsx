@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import icon from '../components/icon';
 import Card from '../components/Card';
-import { BaseUrl } from '../utils/Constans';
 import ConfirmModal from '../components/ConfirmModal';
 import InfoModal from '../components/InfoModal';
 import ForFinalidades from '../Formularios/ForFinalidades';
@@ -26,10 +25,6 @@ function Finalidades() {
     const [finalidadesToShow, setFinalidadesToShow] = useState(null);
 
     //////////////////////////////helpers o Ayudantes/////////////////////////////////////////////////////
-    const getAuthorization = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    }
 
     const openConfirmDelete = (id) => {
         setSelectedFinalidades(id);
@@ -100,7 +95,7 @@ function Finalidades() {
     const fetchFinalidades = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}finalidades`, { headers: getAuthorization() });
+            const response = await api.get('finalidades');
             const data = response.data;
             if (!Array.isArray(data)) {
                 console.warn('Respuesta Inesperada finalidades:', data);
@@ -126,7 +121,7 @@ function Finalidades() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}finalidades/ver/${row.id}`, { headers: getAuthorization() });
+            const response = await api.get(`finalidades/ver/${row.id}`);
             setFinalidadesToShow(response.data);
         } catch (error) {
             console.error('Error al mostrar los datos de esta finalidad', error?.response?.data || error.message);
@@ -139,7 +134,7 @@ function Finalidades() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}finalidades/delete/${id}`, { headers: getAuthorization() });
+            await api.delete(`finalidades/delete/${id}`);
             showToast('Finalidad Eliminada Con exito', 'success', 3000);
             await fetchFinalidades();
         } catch (error) {

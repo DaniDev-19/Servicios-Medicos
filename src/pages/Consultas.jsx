@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import InfoModal from "../components/InfoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
@@ -30,10 +29,6 @@ function Consultas() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editConsulta, setEditConsulta] = useState(null);
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const openConfirmDelete = (id) => {
     setSelectedConsulta(id);
@@ -52,7 +47,7 @@ function Consultas() {
 
   const handleEdit = async (row) => {
     try {
-      const response = await axios.get(`${BaseUrl}consultas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const response = await api.get(`consultas/ver/${row.id}`);
       const consultaCompleta = response.data;
 
       const medicamentosFormato = (consultaCompleta.medicamentos || []).map(med => ({
@@ -74,7 +69,7 @@ function Consultas() {
     if (!row.id) return;
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}consultas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`consultas/ver/${row.id}`);
       const consultaCompleta = res.data;
 
       const docBlob = generateConsultaPDF(consultaCompleta);
@@ -99,7 +94,7 @@ function Consultas() {
 
   const handleView = async (row) => {
     try {
-      const response = await axios.get(`${BaseUrl}consultas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const response = await api.get(`consultas/ver/${row.id}`);
       setConsultaToShow(response.data);
     } catch (error) {
       showToast?.('Error obteniendo los detalles de la consulta', 'error', 3000);
@@ -108,7 +103,7 @@ function Consultas() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${BaseUrl}consultas/delete/${id}`, { headers: getAuthHeaders() });
+      await api.delete(`consultas/delete/${id}`);
       showToast?.('Consulta eliminada correctamente', 'success', 3000);
       fetchConsultas();
     } catch (error) {
@@ -155,7 +150,7 @@ function Consultas() {
   const fetchConsultas = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BaseUrl}consultas`, { headers: getAuthHeaders() });
+      const response = await api.get('consultas');
       const data = response.data;
       if (!Array.isArray(data)) {
         showToast?.('Respuesta inesperada del servidor', 'error', 4000);
@@ -347,12 +342,13 @@ function Consultas() {
           if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         }}
         title="Vista previa PDF"
+        size="pdf"
       >
         {pdfUrl && (
           <iframe
             src={pdfUrl}
             title="Vista previa PDF"
-            style={{ width: "100%", height: "70vh", border: "none" }}
+            style={{ width: "100%", height: "85vh", border: "none" }}
           />
         )}
         <div style={{ marginTop: 16, textAlign: "right" }}>

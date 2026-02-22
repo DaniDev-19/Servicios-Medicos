@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import icon from '../components/icon';
 import Card from '../components/Card';
 import Spinner from '../components/spinner';
 import Table from '../components/Tablas';
 import { useToast } from '../components/userToasd';
-import { BaseUrl } from '../utils/Constans';
 import InfoModal from '../components/InfoModal';
 import ConfirmModal from '../components/ConfirmModal';
 import FormModal from '../components/FormModal';
@@ -25,10 +24,6 @@ function Enfermedades() {
     const showToast = useToast();
 
     /////////////////////////////////////////////////////////////////////////////////////////////// 
-    const getAuthorization = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
 
     const openConfirmDelete = (id) => {
         setSelectedEnfermedad(id);
@@ -62,7 +57,7 @@ function Enfermedades() {
     const fetchEnfermedades = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}enfermedades`, { headers: getAuthorization() });
+            const response = await api.get('enfermedades');
             const data = response.data;
             if (!Array.isArray(data)) {
                 console.warn('Respuesta inesperada /enfermedades:', data);
@@ -82,7 +77,7 @@ function Enfermedades() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}enfermedades/ver/${row.id}`, { headers: getAuthorization() });
+            const response = await api.get(`enfermedades/ver/${row.id}`);
             setShowEnfermedad(response.data);
         } catch (error) {
             const msg = error?.response?.data?.message || 'Respuesta inespedara del servidor error al obtener los datos de este registro';
@@ -95,7 +90,7 @@ function Enfermedades() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}enfermedades/eliminar/${id}`, { headers: getAuthorization() });
+            await api.delete(`enfermedades/eliminar/${id}`);
             showToast?.('Registro Eliminado con éxito', 'success', 3000);
             await fetchEnfermedades();
         } catch (error) {

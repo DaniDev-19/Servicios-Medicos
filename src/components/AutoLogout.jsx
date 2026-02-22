@@ -2,10 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useAlert } from './userAlert';
 import { useNavigate } from 'react-router-dom';
-import { BaseUrl } from '../utils/Constans';
+import api from '../utils/instanceSesion';
 
-const API_URL = BaseUrl;
-const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutos
+const INACTIVITY_LIMIT = 35 * 60 * 1000; // 35 minutos
 
 const AutoLogout = () => {
     const navigate = useNavigate();
@@ -21,11 +20,8 @@ const AutoLogout = () => {
         let backendLogoutOk = false;
         if (currentToken) {
             try {
-                const res = await fetch(`${API_URL}auth/logout`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentToken}` },
-                });
-                backendLogoutOk = res.ok;
+                const res = await api.post('auth/logout', {});
+                backendLogoutOk = res.status === 200 || res.status === 204;
             } catch (e) {
                 console.error('Error cerrando sesión en backend:', e);
             }
@@ -94,10 +90,22 @@ const AutoLogout = () => {
             logout();
         }
 
+        const heartbeatInterval = setInterval(async () => {
+            const currentToken = localStorage.getItem('token');
+            if (currentToken) {
+                try {
+                    await api.post('auth/latido', {});
+                } catch (e) {
+                    console.error('Error enviando latido:', e);
+                }
+            }
+        }, 2 * 60 * 1000); // Cada 2 minutos
+
         // Cleanup al cambiar token o desmontar
         return () => {
             if (tokenTimer.current) clearTimeout(tokenTimer.current);
             if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+            clearInterval(heartbeatInterval);
             events.forEach((ev) => window.removeEventListener(ev, resetInactivityTimer));
         };
     }, [token]);

@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import InfoModal from "../components/InfoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import FormModalOne from "../components/FormModalOne";
@@ -31,10 +30,6 @@ function Pacientes() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editPaciente, setEditPaciente] = useState(null);
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const openConfirmDelete = (id) => {
     setSelectedPaciente(id);
@@ -100,7 +95,7 @@ function Pacientes() {
   const fetchPacientes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BaseUrl}pacientes`, { headers: getAuthHeaders() });
+      const response = await api.get('pacientes');
       const data = response.data;
       if (!Array.isArray(data)) {
         showToast?.('Respuesta inesperada del servidor', 'error', 4000);
@@ -119,7 +114,7 @@ function Pacientes() {
   const handleView = async (row) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}pacientes/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`pacientes/${row.id}`);
       setPacienteToShow(res.data);
     } catch (error) {
       showToast?.('No se pudo obtener la información del paciente', 'error');
@@ -131,7 +126,7 @@ function Pacientes() {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`${BaseUrl}pacientes/delete/${id}`, { headers: getAuthHeaders() });
+      await api.delete(`pacientes/delete/${id}`);
       showToast?.('Paciente eliminado con éxito', 'success', 3000);
       await fetchPacientes();
     } catch (error) {
@@ -144,7 +139,7 @@ function Pacientes() {
   useEffect(() => {
     const updateStatuses = async () => {
       try {
-        await axios.get(`${BaseUrl}reposos/actualizar-estados`, { headers: getAuthHeaders() });
+        await api.get('reposos/actualizar-estados');
       } catch (error) {
         console.error('Error actualizando estados:', error);
       }
@@ -285,12 +280,13 @@ function Pacientes() {
           if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         }}
         title="Vista previa PDF"
+        size="pdf"
       >
         {pdfUrl && (
           <iframe
             src={pdfUrl}
             title="Vista previa PDF"
-            style={{ width: "100%", height: "70vh", border: "none" }}
+            style={{ width: "100%", height: "85vh", border: "none" }}
           />
         )}
         <div style={{ marginTop: 16, textAlign: "right" }}>

@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import "../index.css";
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import ConfirmModal from "../components/ConfirmModal";
 import InfoModal from "../components/InfoModal";
 import FormModal from "../components/FormModal";
@@ -29,10 +28,6 @@ function Usuarios() {
 
   const showToast = useToast();
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem("token") || "").trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const handleNuevo = () => {
     setEditUser(null);
@@ -160,7 +155,7 @@ function Usuarios() {
   const fetchUsuarios = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}usuarios`, { headers: getAuthHeaders() });
+      const res = await api.get('usuarios');
       const data = Array.isArray(res.data) ? res.data : [];
       setUsuarios(data);
     } catch (error) {
@@ -180,9 +175,7 @@ function Usuarios() {
   const handleView = async (row) => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BaseUrl}usuarios/ver/${row.id}`, {
-        headers: getAuthHeaders()
-      });
+      const response = await api.get(`usuarios/ver/${row.id}`);
       setUserToShow(response.data);
     } catch (error) {
       console.error("Error al mostrar usuario:", error?.response?.data || error.message);
@@ -195,9 +188,7 @@ function Usuarios() {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`${BaseUrl}usuarios/eliminar/${id}`, {
-        headers: getAuthHeaders()
-      });
+      await api.delete(`usuarios/eliminar/${id}`);
       showToast?.("Usuario eliminado con éxito", "success", 3000);
       await fetchUsuarios();
     } catch (error) {

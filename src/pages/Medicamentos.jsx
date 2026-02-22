@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "../index.css";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import Card from "../components/Card";
@@ -13,6 +12,7 @@ import FormModal from "../components/FormModal";
 import ForMedicamentos from "../Formularios/ForMedicamentos";
 import SingleSelect from "../components/SingleSelect";
 import { exportToPDF, exportToExcel } from "../utils/exportUtils";
+import { generateInventarioPDF } from "../utils/pdfGenerator";
 import { usePermiso } from '../utils/usePermiso';
 
 function Medicamentos() {
@@ -28,15 +28,11 @@ function Medicamentos() {
   const [selectedId, setSelectedId] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem("token") || "").trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const fetchMedicamentos = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}medicamentos`, { headers: getAuthHeaders() });
+      const res = await api.get('medicamentos');
       const data = res.data;
       if (!Array.isArray(data)) {
         console.warn("Respuesta inesperada /medicamentos:", data);
@@ -70,7 +66,7 @@ function Medicamentos() {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`${BaseUrl}medicamentos/eliminar/${id}`, { headers: getAuthHeaders() });
+      await api.delete(`medicamentos/eliminar/${id}`);
       showToast?.("Medicamento eliminado", "success");
       await fetchMedicamentos();
     } catch (err) {
@@ -100,7 +96,7 @@ function Medicamentos() {
   const handleView = async (row) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}medicamentos/ver/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`medicamentos/ver/${row.id}`);
       setMedicamentoToShow(res.data);
     } catch (err) {
       console.error("Error mostrando medicamento:", err);
@@ -175,13 +171,7 @@ function Medicamentos() {
   ];
 
   const handlePreviewPDF = () => {
-    const docBlob = exportToPDF({
-      data: filtered,
-      columns: exportColumns,
-      fileName: "medicamentos.pdf",
-      title: "Listado de Medicamentos",
-      preview: true
-    });
+    const docBlob = generateInventarioPDF(medicamentos);
     if (docBlob) {
       const url = URL.createObjectURL(docBlob);
       setPdfUrl(url);
@@ -256,12 +246,13 @@ function Medicamentos() {
           if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         }}
         title="Vista previa PDF"
+        size="pdf"
       >
         {pdfUrl && (
           <iframe
             src={pdfUrl}
             title="Vista previa PDF"
-            style={{ width: "100%", height: "70vh", border: "none" }}
+            style={{ width: "100%", height: "85vh", border: "none" }}
           />
         )}
         <div style={{ marginTop: 16, textAlign: "right" }}>
@@ -315,9 +306,9 @@ function Medicamentos() {
             </div>
           </div>
           <div className="actions">
-            {tienePermiso("medicamentos", "exportar") && (
+            {tienePermiso('medicamentos', 'exportar') && (
               <button className="btn btn-secondary" onClick={handlePreviewPDF}>
-                <img src={icon.pdf1} className="btn-icon" alt="" style={{ marginRight: 5 }} /> PDF
+                <img src={icon.pdf1} alt="PDF" className="btn-icon" style={{ marginRight: 5 }} /> PDF
               </button>
             )}
             {tienePermiso("medicamentos", "exportar") && (

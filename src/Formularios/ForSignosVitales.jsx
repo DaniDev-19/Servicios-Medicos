@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import SingleSelect from "../components/SingleSelect";
@@ -21,6 +20,7 @@ function ForSignosVitales({ pacienteId, onSuccess, onCancel, signoToEdit = null,
         saturacion_oxigeno: "",
         peso: "",
         talla: "",
+        altura: "",
         consulta_id: ""
     });
 
@@ -40,9 +40,7 @@ function ForSignosVitales({ pacienteId, onSuccess, onCancel, signoToEdit = null,
     useEffect(() => {
         const fetchConsultas = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const headers = token ? { Authorization: `Bearer ${token}` } : {};
-                const response = await axios.get(`${BaseUrl}consultas/paciente/${pacienteId}`, { headers });
+                const response = await api.get(`consultas/paciente/${pacienteId}`);
                 const consultasData = response.data || [];
                 setConsultas(consultasData);
 
@@ -78,6 +76,7 @@ function ForSignosVitales({ pacienteId, onSuccess, onCancel, signoToEdit = null,
                 saturacion_oxigeno: signoToEdit.saturacion_oxigeno || "",
                 peso: signoToEdit.peso || "",
                 talla: signoToEdit.talla || "",
+                altura: signoToEdit.altura || "",
                 consulta_id: signoToEdit.consulta_id || ""
             });
         }
@@ -98,9 +97,6 @@ function ForSignosVitales({ pacienteId, onSuccess, onCancel, signoToEdit = null,
         setLoading(true);
 
         try {
-            const token = localStorage.getItem("token");
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
             // Validación básica
             if (!formData.consulta_id) {
                 showToast?.("Debe seleccionar una consulta", "error");
@@ -116,17 +112,18 @@ function ForSignosVitales({ pacienteId, onSuccess, onCancel, signoToEdit = null,
                 temperatura: formData.temperatura ? parseFloat(formData.temperatura) : null,
                 saturacion_oxigeno: formData.saturacion_oxigeno ? parseInt(formData.saturacion_oxigeno) : null,
                 peso: formData.peso ? parseFloat(formData.peso) : null,
-                talla: formData.talla ? parseFloat(formData.talla) : null,
+                talla: formData.talla,
+                altura: formData.altura ? parseFloat(formData.altura) : null,
                 consulta_id: parseInt(formData.consulta_id)
             };
 
             if (signoToEdit) {
                 // Actualizar
-                await axios.put(`${BaseUrl}signos_vitales/actualizar/${signoToEdit.id}`, dataToSend, { headers });
+                await api.put(`signos_vitales/actualizar/${signoToEdit.id}`, dataToSend);
                 showToast?.("Signos vitales actualizados correctamente", "success");
             } else {
                 // Crear
-                await axios.post(`${BaseUrl}signos_vitales/registrar`, dataToSend, { headers });
+                await api.post('signos_vitales/registrar', dataToSend);
                 showToast?.("Signos vitales registrados correctamente", "success");
             }
 
@@ -292,12 +289,24 @@ function ForSignosVitales({ pacienteId, onSuccess, onCancel, signoToEdit = null,
 
                 {/* Talla */}
                 <div className="fc-field">
-                    <label>Talla (m)</label>
+                    <label>Talla (Ej: M, L, XL o notas)</label>
+                    <input
+                        type="text"
+                        name="talla"
+                        value={formData.talla}
+                        onChange={handleChange}
+                        placeholder="Ej: M o 1.75"
+                        disabled={readOnly}
+                    />
+                </div>
+                {/* Altura */}
+                <div className="fc-field">
+                    <label>Altura (m)</label>
                     <input
                         type="number"
                         step="0.01"
-                        name="talla"
-                        value={formData.talla}
+                        name="altura"
+                        value={formData.altura}
                         onChange={handleChange}
                         placeholder="Ej: 1.75"
                         min="0"

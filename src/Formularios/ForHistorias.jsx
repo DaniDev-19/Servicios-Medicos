@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import MultiSelect from "../components/MultiSelect";
@@ -28,11 +27,9 @@ function ForHistorias({ pacienteId, onSuccess, onCancel, historiaToEdit = null }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
         // 1. Cargar catálogo de enfermedades
-        const enfResponse = await axios.get(`${BaseUrl}historias_medicas/enfermedades`, { headers });
+        const enfResponse = await api.get('historias_medicas/enfermedades');
         const options = (enfResponse.data || []).map(e => ({
           value: e.id,
           label: e.nombre
@@ -46,7 +43,7 @@ function ForHistorias({ pacienteId, onSuccess, onCancel, historiaToEdit = null }
           // Si no tiene detalle (enfermedades), hacemos fetch para obtenerlo
           if (!historiaToEdit.detalle) {
             try {
-              const fullHistResponse = await axios.get(`${BaseUrl}historias_medicas/ver/${historiaToEdit.id}`, { headers });
+              const fullHistResponse = await api.get(`historias_medicas/ver/${historiaToEdit.id}`);
               historiaCompleta = fullHistResponse.data;
             } catch (err) {
               console.error("Error al cargar detalle de historia:", err);
@@ -100,7 +97,6 @@ function ForHistorias({ pacienteId, onSuccess, onCancel, historiaToEdit = null }
 
     try {
       const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       // Obtener ID de usuario del token
       let usuarios_id = null;
@@ -124,10 +120,10 @@ function ForHistorias({ pacienteId, onSuccess, onCancel, historiaToEdit = null }
       };
 
       if (historiaToEdit) {
-        await axios.put(`${BaseUrl}historias_medicas/actualizar/${historiaToEdit.id}`, dataToSend, { headers });
+        await api.put(`historias_medicas/actualizar/${historiaToEdit.id}`, dataToSend);
         showToast?.("Historia médica actualizada correctamente", "success");
       } else {
-        await axios.post(`${BaseUrl}historias_medicas/registrar`, dataToSend, { headers });
+        await api.post('historias_medicas/registrar', dataToSend);
         showToast?.("Historia médica registrada correctamente", "success");
       }
 

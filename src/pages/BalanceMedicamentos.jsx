@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
-import { BaseUrl } from '../utils/Constans';
+import api from '../utils/instanceSesion';
 import { useToast } from '../components/userToasd';
 import Spinner from '../components/spinner';
 import Tablas from '../components/Tablas';
 import Card from '../components/Card';
 import icon from '../components/icon';
 import { exportToPDF } from '../utils/exportUtils';
+import { generateKardexPDF } from '../utils/pdfGenerator';
+import { usePermiso } from '../utils/usePermiso';
 import FormModal from "../components/FormModal";
 import {
     Chart as ChartJS,
@@ -30,20 +31,17 @@ ChartJS.register(
 );
 
 function BalanceMedicamentos() {
+    const tienePermiso = usePermiso();
     const showToast = useToast();
     const [movimientos, setMovimientos] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pdfUrl, setPdfUrl] = useState(null);
 
-    const getAuthHeaders = () => {
-        const token = (localStorage.getItem("token") || "").trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
 
     const fetchMovimientos = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${BaseUrl}medicamentos/movimientos/historial`, { headers: getAuthHeaders() });
+            const res = await api.get('medicamentos/movimientos/historial');
             setMovimientos(res.data);
         } catch (err) {
             console.error("Error obteniendo movimientos:", err);
@@ -161,25 +159,7 @@ function BalanceMedicamentos() {
     ];
 
     const handleExportPDF = () => {
-        // Preparar columnas y datos para el PDF
-        // Como 'exportToPDF' usa 'render' si existe, necesitamos que 'render' devuelva TEXTO para el PDF,
-        // o pasar columnas simplificadas.
-        const pdfColumns = [
-            { header: "Fecha", key: "fecha", render: (row) => new Date(row.fecha).toLocaleString() },
-            { header: "Medicamento", key: "medicamento" },
-            { header: "Tipo", key: "tipo_movimiento", render: (row) => row.tipo_movimiento ? row.tipo_movimiento.toUpperCase() : '' },
-            { header: "Cantidad", key: "cantidad" },
-            { header: "Usuario", key: "usuario", render: (row) => row.usuario ? row.usuario : 'Sistema/Automático' },
-            { header: "Motivo", key: "motivo" }
-        ];
-
-        const docBlob = exportToPDF({
-            data: movimientos,
-            columns: pdfColumns,
-            fileName: "balance_medicamentos.pdf",
-            title: "Balance de Movimientos de Medicamentos",
-            preview: true
-        });
+        const docBlob = generateKardexPDF(movimientos);
         if (docBlob) {
             const url = URL.createObjectURL(docBlob);
             setPdfUrl(url);
@@ -197,12 +177,13 @@ function BalanceMedicamentos() {
                     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
                 }}
                 title="Vista previa PDF"
+                size="pdf"
             >
                 {pdfUrl && (
                     <iframe
                         src={pdfUrl}
                         title="Vista previa PDF"
-                        style={{ width: "100%", height: "70vh", border: "none" }}
+                        style={{ width: "100%", height: "85vh", border: "none" }}
                     />
                 )}
                 <div style={{ marginTop: 16, textAlign: "right" }}>
@@ -236,11 +217,13 @@ function BalanceMedicamentos() {
             </div>
 
             <div className="pac-toolbar" style={{ marginBottom: 10, justifyContent: 'space-between', display: 'flex' }}>
-                <h3 style={{ margin: 0, alignSelf: 'center' }}>Detalle de Movimientos</h3>
-                <button className="btn btn-secondary" onClick={handleExportPDF}>
-                    <img src={icon.pdf1 || ""} className="btn-icon" alt="" style={{ marginRight: 5 }} />
-                    Exportar Reporte
-                </button>
+                {tienePermiso('medicamentos', 'exportar') && (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button className="btn btn-secondary" onClick={handleExportPDF}>
+                            <img src={icon.pdf1} alt="PDF" className="btn-icon" /> Exportar Reporte
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="table-wrap">

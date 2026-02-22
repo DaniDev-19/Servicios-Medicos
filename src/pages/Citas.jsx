@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import FormModal from "../components/FormModal";
 import ForCitas from "../Formularios/ForCitas";
 import ForConsultas from "../Formularios/ForConsultas";
@@ -34,8 +33,7 @@ function Citas() {
     const fetchCitas = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${BaseUrl}citas`, { headers: { Authorization: `Bearer ${token}` } });
+            const response = await api.get('citas');
             setCitas(response.data);
         } catch (error) {
             console.error(error);
@@ -62,8 +60,7 @@ function Citas() {
     const handleDelete = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${BaseUrl}citas/eliminar/${selectedIdToDelete}`, { headers: { Authorization: `Bearer ${token}` } });
+            await api.delete(`citas/eliminar/${selectedIdToDelete}`);
             showToast("Cita eliminada", "success");
             fetchCitas();
         } catch (error) {

@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import '../index.css';
 import Card from '../components/Card';
 import Tablas from '../components/Tablas';
 import icon from '../components/icon';
 import Spinner from '../components/spinner';
-import { BaseUrl } from '../utils/Constans';
 import ConfirmModal from '../components/ConfirmModal';
 import InfoModal from "../components/InfoModal";
 import FormModal from "../components/FormModal";
@@ -26,10 +25,6 @@ function Cargos() {
     const showToast = useToast();
 
     ////////////////////////////Helpers ---> Ayudantes/////////////////////////////////////////////
-    const getAuhtHeaders = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token} ` } : {};
-    };
 
     const openConfirmDelete = (id) => {
         setSelectedCargo(id);
@@ -101,7 +96,7 @@ function Cargos() {
     const fecthCargos = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}cargos`, { headers: getAuhtHeaders() });
+            const response = await api.get('cargos');
             const data = response.data;
             if (!Array.isArray(data)) {
                 console.warn('Respuesta inesperada /cargos:', data);
@@ -126,7 +121,7 @@ function Cargos() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}cargos/ver/${row.id}`, { headers: getAuhtHeaders() });
+            const response = await api.get(`cargos/ver/${row.id}`);
             setCargosToShow(response.data);
         } catch (error) {
             console.error('Error al mostrar datos:', error?.response?.data || error.message);
@@ -139,7 +134,7 @@ function Cargos() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}cargos/eliminar/${id}`, { headers: getAuhtHeaders() });
+            await api.delete(`cargos/eliminar/${id}`);
             showToast('Cargo eliminado con exito', 'success', 3000);
             await fecthCargos();
         } catch (error) {

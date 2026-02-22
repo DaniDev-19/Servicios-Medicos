@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import '../styles/toasd.css';
-
-const ToastContext = createContext();
+import { subscribeToGlobalNotifications } from '../utils/globalNotification';
+import { ToastContext } from '../utils/toastContext';
 
 export function ToastProvider({ children }) {
     const [toasts, setToasts] = useState([]);
@@ -15,6 +15,13 @@ export function ToastProvider({ children }) {
         }, duration);
     }, []);
 
+    useEffect(() => {
+        const unsubscribe = subscribeToGlobalNotifications((message, type, duration) => {
+            showToast(message, type, duration);
+        });
+        return () => unsubscribe();
+    }, [showToast]);
+
     return (
         <ToastContext.Provider value={{ showToast }}>
             {children}
@@ -22,8 +29,8 @@ export function ToastProvider({ children }) {
                 {toasts.map(toast => (
                     <div key={toast.id} className={`toast toast-${toast.type}`}>
                         <span>{toast.message}</span>
-                        <div 
-                            className="toast-progress" 
+                        <div
+                            className="toast-progress"
                             style={{ animationDuration: `${toast.duration}ms` }}
                         ></div>
                     </div>
@@ -33,4 +40,4 @@ export function ToastProvider({ children }) {
     );
 }
 
-export const useToastContext = () => useContext(ToastContext);
+export default ToastProvider;

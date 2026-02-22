@@ -1,13 +1,12 @@
 
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import InfoModal from "../components/InfoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
@@ -31,10 +30,6 @@ function Doctores() {
   const [editDoctor, setEditDoctor] = useState(null);
 
   //////---------------------helpers para token y autorization en fetcher y handles -----------------------------/////// 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const openConfirmDelete = (id) => {
     setSelectedDoctor(id);
@@ -113,7 +108,7 @@ function Doctores() {
   const fetchDoctores = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BaseUrl}doctores`, { headers: getAuthHeaders() });
+      const response = await api.get('doctores');
       const data = response.data;
       if (!Array.isArray(data)) {
         console.warn('Respuesta inesperada /doctores:', data);
@@ -136,7 +131,7 @@ function Doctores() {
   const handleView = async (row) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}doctores/ver/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`doctores/ver/${row.id}`);
       setDoctorToShow(res.data);
     } catch (error) {
       console.error('error Al mostrar datos por id de doctor', error);
@@ -151,7 +146,7 @@ function Doctores() {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`${BaseUrl}doctores/eliminar/${id}`, { headers: getAuthHeaders() });
+      await api.delete(`doctores/eliminar/${id}`);
       showToast?.('Doctor eliminado con éxito', 'success', 3000);
       await fetchDoctores();
     } catch (error) {
@@ -313,12 +308,13 @@ function Doctores() {
           if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         }}
         title="Vista previa PDF"
+        size="pdf"
       >
         {pdfUrl && (
           <iframe
             src={pdfUrl}
             title="Vista previa PDF"
-            style={{ width: "100%", height: "70vh", border: "none" }}
+            style={{ width: "100%", height: "85vh", border: "none" }}
           />
         )}
         <div style={{ marginTop: 16, textAlign: "right" }}>

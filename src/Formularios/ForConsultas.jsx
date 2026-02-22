@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../index.css";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import Spinner from "../components/spinner";
 import { useToast } from "../components/userToasd";
 import SingleSelect from "../components/SingleSelect";
@@ -43,12 +42,10 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
     const fetchCatalogos = async () => {
       setLoading(true);
       try {
-        const token = (localStorage.getItem('token') || '').trim();
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const [pacRes, enfRes, medRes] = await Promise.all([
-          axios.get(`${BaseUrl}consultas/pacientes`, { headers }),
-          axios.get(`${BaseUrl}consultas/enfermedades`, { headers }),
-          axios.get(`${BaseUrl}consultas/medicamentos`, { headers }),
+          api.get('consultas/pacientes'),
+          api.get('consultas/enfermedades'),
+          api.get('consultas/medicamentos'),
         ]);
         setPacientes(pacRes.data);
         setEnfermedades(enfRes.data);
@@ -70,10 +67,7 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
         return;
       }
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${BaseUrl}citas/pendientes/${form.pacientes_id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get(`citas/pendientes/${form.pacientes_id}`);
         let citas = response.data;
 
         // Si estamos editando y hay una cita asociada, verificar si está en la lista
@@ -83,9 +77,7 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
           // Si la cita asociada no está en pendientes, cargarla por separado
           if (!citaExiste) {
             try {
-              const citaResponse = await axios.get(`${BaseUrl}citas/ver/${form.citas_id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-              });
+              const citaResponse = await api.get(`citas/ver/${form.citas_id}`);
               const citaActual = citaResponse.data;
               // Agregar la cita actual al inicio de la lista
               citas = [citaActual, ...citas];
@@ -188,14 +180,11 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
     }
     setLoading(true);
     try {
-      const token = (localStorage.getItem('token') || '').trim();
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       if (isEdit) {
-        await axios.put(`${BaseUrl}consultas/actualizar/${initialData.id}`, form, { headers });
+        await api.put(`consultas/actualizar/${initialData.id}`, form);
         showToast?.("Consulta actualizada correctamente", "success");
       } else {
-        await axios.post(`${BaseUrl}consultas/registrar`, form, { headers });
+        await api.post('consultas/registrar', form);
         showToast?.("Consulta registrada correctamente", "success");
       }
 

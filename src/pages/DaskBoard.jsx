@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,7 +20,8 @@ import '../styles/dashboard.css';
 import icon from '../components/icon';
 import { useAlert } from "../components/userAlert";
 import Spinner from '../components/spinner';
-import { BaseUrl } from "../utils/Constans";
+import FormModal from '../components/FormModal';
+import { generateEpidemiologicoPDF, generateProductividadPDF } from '../utils/pdfGenerator';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -55,29 +56,87 @@ function DashboardPage() {
     proximasCitas: [],
     enfermedadesComunes: [],
     medicamentosBajoStock: [],
-    departamentosTop: []
+    departamentosTop: [],
+    totalActividades: 0
   });
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
+  const [actividadesPage, setActividadesPage] = useState(1);
+  const [loadingActividad, setLoadingActividad] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfTitle, setPdfTitle] = useState("");
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await api.get('dashboard/stats');
+      setStats(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      showAlert("Error al cargar datos del dashboard", "error", 4000);
+      setLoading(false);
+    }
+  };
+
+  const fetchPaginatedActivity = async (page) => {
+    setLoadingActividad(true);
+    try {
+      const response = await api.get(`dashboard/actividad?page=${page}&limit=5`);
+      setStats(prev => ({
+        ...prev,
+        actividadReciente: response.data.actividades,
+        totalActividades: response.data.totalActividades
+      }));
+      setLoadingActividad(false);
+    } catch (error) {
+      console.error("Error fetching paginated activity:", error);
+      showAlert("Error al cargar más actividad", "error", 4000);
+      setLoadingActividad(false);
+    }
+  };
+
+  const handleEpidemiologicoPDF = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('reportes/epidemiologico');
+      const docBlob = generateEpidemiologicoPDF(res.data);
+      if (docBlob) {
+        setPdfUrl(URL.createObjectURL(docBlob));
+        setPdfTitle("Reporte Epidemiológico (Morbilidad)");
+      }
+    } catch (err) {
+      console.error("Error generando reporte epidemiológico:", err);
+      showAlert("Error al generar reporte de morbilidad", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProductividadPDF = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('reportes/productividad');
+      const docBlob = generateProductividadPDF(res.data);
+      if (docBlob) {
+        setPdfUrl(URL.createObjectURL(docBlob));
+        setPdfTitle("Reporte de Productividad Médica");
+      }
+    } catch (err) {
+      console.error("Error generando reporte de productividad:", err);
+      showAlert("Error al generar reporte de eficiencia", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await axios.get(`${BaseUrl}dashboard/stats`, { headers: getAuthHeaders() });
-        setStats(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        showAlert("Error al cargar datos del dashboard", "error", 4000);
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    if (actividadesPage > 1) {
+      fetchPaginatedActivity(actividadesPage);
+    }
+  }, [actividadesPage]);
 
   // Configuración de gráficos
   const lineChartOptions = {
@@ -167,15 +226,33 @@ function DashboardPage() {
 
   return (
     <div className="dashboard-wrapper">
-      {/* Columna Principal */}
+      <FormModal
+        isOpen={!!pdfUrl}
+        onClose={() => {
+          setPdfUrl(null);
+          if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+        }}
+        title={pdfTitle}
+        size="pdf"
+      >
+        {pdfUrl && (
+          <iframe
+            src={pdfUrl}
+            title="Vista previa PDF"
+            style={{ width: "100%", height: "85vh", border: "none" }}
+          />
+        )}
+        <div style={{ marginTop: 16, textAlign: "right" }}>
+          <a href={pdfUrl} download={`${pdfTitle.toLowerCase().replace(/ /g, "_")}.pdf`} className="btn btn-primary">Descargar PDF</a>
+        </div>
+      </FormModal>
+
       <div className="dashboard-main">
-        {/* Header */}
         <header className="dashboard-header">
           <h1 className="dashboard-title">Panel de Control</h1>
           <p className="dashboard-subtitle">Bienvenido al Sistema de Gestión Integral de Servicios Médicos</p>
         </header>
 
-        {/* Tarjetas de Estadísticas */}
         <section className="stats-grid">
           {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
             <div className="stat-card" onClick={() => navigate('/admin/pacientes')} style={{ cursor: 'pointer' }}>
@@ -230,7 +307,6 @@ function DashboardPage() {
           )}
         </section>
 
-        {/* Gráficos */}
         <section className="charts-grid">
           {tienePermiso('home', 'ver') && tienePermiso('home', 'graficas') && (
             <div className="chart-card">
@@ -255,23 +331,43 @@ function DashboardPage() {
           )}
         </section>
 
-        {/* Actividad Reciente */}
         {tienePermiso('home', 'ver') && tienePermiso('home', 'actividad') && (
           <div className="sidebar-section">
             <h3 className="sidebar-title">Actividad Reciente</h3>
-            <div className="info-list">
+            <div className={`info-list ${loadingActividad ? 'loading-opacity' : ''}`}>
               {stats.actividadReciente.length > 0 ? (
-                stats.actividadReciente.map((act, index) => (
-                  <div key={index} className="info-item">
-                    <div className="info-dot"></div>
-                    <div className="info-content">
-                      <span className="info-text">{act.descripcion}</span>
-                      <span className="info-subtext">
-                        {new Date(act.fecha).toLocaleDateString()} {new Date(act.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {act.usuario}
-                      </span>
+                <>
+                  {stats.actividadReciente.map((act, index) => (
+                    <div key={index} className="info-item">
+                      <div className="info-dot"></div>
+                      <div className="info-content">
+                        <span className="info-text">{act.descripcion}</span>
+                        <span className="info-subtext">
+                          {new Date(act.fecha).toLocaleDateString()} {new Date(act.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {act.usuario}
+                        </span>
+                      </div>
                     </div>
+                  ))}
+                  <div className="pagination-controls">
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setActividadesPage(p => Math.max(1, p - 1))}
+                      disabled={actividadesPage === 1 || loadingActividad}
+                    >
+                      Anterior
+                    </button>
+                    <span className="pagination-info">
+                      Página {actividadesPage} de {Math.ceil(stats.totalActividades / 5)}
+                    </span>
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setActividadesPage(p => p + 1)}
+                      disabled={actividadesPage >= Math.ceil(stats.totalActividades / 5) || loadingActividad}
+                    >
+                      Siguiente
+                    </button>
                   </div>
-                ))
+                </>
               ) : (
                 <div className="info-item">
                   <span className="info-text">No hay actividad reciente registrada.</span>
@@ -282,9 +378,23 @@ function DashboardPage() {
         )}
       </div>
 
-      {/* Columna Lateral */}
       <div className="dashboard-sidebar">
-        {/* Acciones Rápidas */}
+        {tienePermiso('home', 'exportar') && (
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">Reportes Gerenciales</h3>
+            <div className="quick-actions-grid">
+              <button className="action-btn" onClick={handleEpidemiologicoPDF} title="Análisis de Morbilidad">
+                <img src={icon.estetoscopio2} alt="Epidemiología" style={{ filter: 'hue-rotate(90deg)' }} />
+                <span>Morfología / Epidemiología</span>
+              </button>
+              <button className="action-btn" onClick={handleProductividadPDF} title="Eficiencia de Consultas">
+                <img src={icon.carpetaplus2} alt="Productividad" style={{ filter: 'hue-rotate(240deg)' }} />
+                <span>Productividad Médica</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
           <div className="sidebar-section">
             <h3 className="sidebar-title">Acciones Rápidas</h3>
@@ -316,7 +426,6 @@ function DashboardPage() {
             </div>
           </div>
         )}
-        {/* Próximas Citas */}
         <div className="sidebar-section">
           <h3 className="sidebar-title">Próximas Citas</h3>
           <div className="info-list">
@@ -341,7 +450,6 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Alerta de Stock */}
         <div className="sidebar-section">
           <h3 className="sidebar-title" style={{ color: '#ef4444' }}>Alerta de Stock</h3>
           <div className="info-list">

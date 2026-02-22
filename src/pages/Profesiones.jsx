@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import '../index.css';
 import Card from '../components/Card';
 import Tablas from '../components/Tablas';
 import icon from '../components/icon';
 import Spinner from '../components/spinner';
-import { BaseUrl } from '../utils/Constans';
 import ConfirmModal from '../components/ConfirmModal';
 import InfoModal from "../components/InfoModal";
 import FormModal from "../components/FormModal";
@@ -26,10 +25,6 @@ function Profesiones() {
     const showToast = useToast();
 
     ////////////////////////////Helpers ---> Ayudantes/////////////////////////////////////////////
-    const getAuthHeaders = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
 
     const openConfirmDelete = (id) => {
         setSelectedProfesion(id);
@@ -101,7 +96,7 @@ function Profesiones() {
     const fetchProfesiones = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}profesion`, { headers: getAuthHeaders() });
+            const response = await api.get('profesion');
             const data = response.data;
             if (!Array.isArray(data)) {
                 console.warn('Respuesta inesperada /profesion:', data);
@@ -127,7 +122,7 @@ function Profesiones() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}profesion/ver/${row.id}`, { headers: getAuthHeaders() });
+            const response = await api.get(`profesion/ver/${row.id}`);
             setProfesionToShow(response.data);
         } catch (error) {
             console.error('Error al mostrar datos:', error?.response?.data || error.message);
@@ -140,7 +135,7 @@ function Profesiones() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}profesion/eliminar/${id}`, { headers: getAuthHeaders() });
+            await api.delete(`profesion/eliminar/${id}`);
             showToast?.('Profesión eliminada con éxito', 'success', 3000);
             await fetchProfesiones();
         } catch (error) {

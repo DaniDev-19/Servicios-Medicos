@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../index.css";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { validateField, validationRules } from "../utils/validation";
 import Spinner from "../components/spinner";
 import { useToast } from "../components/userToasd";
@@ -84,19 +83,17 @@ function ForPacientes({ initialData = {}, onSave, onClose }) {
     const fetchCatalogos = async () => {
       setLoading(true);
       try {
-        const token = (localStorage.getItem('token') || '').trim();
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const [
           estadosRes, municipiosRes, parroquiasRes, sectoresRes,
           departamentosRes, cargosRes, profesionesRes
         ] = await Promise.all([
-          axios.get(`${BaseUrl}pacientes/all_estados`, { headers }),
-          axios.get(`${BaseUrl}pacientes/all_municipios`, { headers }),
-          axios.get(`${BaseUrl}pacientes/all_parroquias`, { headers }),
-          axios.get(`${BaseUrl}pacientes/all_sectores`, { headers }),
-          axios.get(`${BaseUrl}pacientes/all_deparatamentos`, { headers }),
-          axios.get(`${BaseUrl}pacientes/all_cargos`, { headers }),
-          axios.get(`${BaseUrl}pacientes/all_profesion`, { headers }),
+          api.get('pacientes/all_estados'),
+          api.get('pacientes/all_municipios'),
+          api.get('pacientes/all_parroquias'),
+          api.get('pacientes/all_sectores'),
+          api.get('pacientes/all_deparatamentos'),
+          api.get('pacientes/all_cargos'),
+          api.get('pacientes/all_profesion'),
         ]);
         setEstados(estadosRes.data);
         setMunicipios(municipiosRes.data);
@@ -137,22 +134,22 @@ function ForPacientes({ initialData = {}, onSave, onClose }) {
     }
   }, [initialData]);
 
-  
+
   useEffect(() => {
     if (initialData?.id && municipios.length > 0 && parroquias.length > 0 && sectores.length > 0) {
-      
+
       if (initialData.estado_id) {
         const munisFiltrados = municipios.filter(m => m.estado_id === initialData.estado_id);
         setMunicipiosFiltrados(munisFiltrados);
       }
 
-      
+
       if (initialData.municipio_id) {
         const parrosFiltradas = parroquias.filter(p => p.municipio_id === initialData.municipio_id);
         setParroquiasFiltradas(parrosFiltradas);
       }
 
-      
+
       if (initialData.parroquia_id) {
         const sectsFiltrados = sectores.filter(s => s.parroquia_id === initialData.parroquia_id);
         setSectoresFiltrados(sectsFiltrados);
@@ -286,14 +283,12 @@ function ForPacientes({ initialData = {}, onSave, onClose }) {
     }
     setLoading(true);
     try {
-      const token = (localStorage.getItem('token') || '').trim();
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       let res;
       if (isEdit) {
-        res = await axios.put(`${BaseUrl}pacientes/actualizar/${initialData.id}`, form, { headers });
+        res = await api.put(`pacientes/actualizar/${initialData.id}`, form);
         showToast?.("Paciente actualizado correctamente", "success");
       } else {
-        res = await axios.post(`${BaseUrl}pacientes/registrar`, form, { headers });
+        res = await api.post('pacientes/registrar', form);
         showToast?.("Paciente registrado correctamente", "success");
       }
       if (onSave) onSave(res.data);

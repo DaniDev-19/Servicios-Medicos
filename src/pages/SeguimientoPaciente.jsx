@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import FormModal from "../components/FormModal";
@@ -46,14 +45,11 @@ function SeguimientoPaciente() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-      const pacienteRes = await axios.get(`${BaseUrl}pacientes/${id}`, { headers });
+      const pacienteRes = await api.get(`pacientes/${id}`);
       setPaciente(pacienteRes.data);
 
       try {
-        const historiaRes = await axios.get(`${BaseUrl}historias_medicas/paciente/${id}`, { headers });
+        const historiaRes = await api.get(`historias_medicas/paciente/${id}`);
         setHistoria(historiaRes.data || null);
       } catch (e) {
         console.log("No hay historia médica", e);
@@ -76,9 +72,7 @@ function SeguimientoPaciente() {
 
   const fetchSignosVitales = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const signosRes = await axios.get(`${BaseUrl}signos_vitales/paciente/${id}`, { headers });
+      const signosRes = await api.get(`signos_vitales/paciente/${id}`);
       setSignos(signosRes.data || []);
     } catch (e) {
       console.log("Error al cargar signos vitales", e);
@@ -87,9 +81,7 @@ function SeguimientoPaciente() {
 
   const fetchReposos = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const repososRes = await axios.get(`${BaseUrl}reposos/paciente/${id}`, { headers });
+      const repososRes = await api.get(`reposos/paciente/${id}`);
       setReposos(repososRes.data || []);
     } catch (e) {
       console.log("Error al cargar reposos", e);
@@ -98,9 +90,7 @@ function SeguimientoPaciente() {
 
   const fetchSeguimientos = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const seguimientosRes = await axios.get(`${BaseUrl}seguimientos/paciente/${id}`, { headers });
+      const seguimientosRes = await api.get(`seguimientos/paciente/${id}`);
       setSeguimientos(seguimientosRes.data || []);
     } catch (e) {
       console.log("Error al cargar seguimientos", e);
@@ -109,9 +99,7 @@ function SeguimientoPaciente() {
 
   const fetchConsultas = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const consultasRes = await axios.get(`${BaseUrl}consultas/paciente/${id}`, { headers });
+      const consultasRes = await api.get(`consultas/paciente/${id}`);
       setConsultas(consultasRes.data || []);
     } catch (e) {
       console.log("Error al cargar consultas", e);
@@ -120,9 +108,7 @@ function SeguimientoPaciente() {
 
   const fetchMedicamentos = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get(`${BaseUrl}medicamentos/paciente/${id}`, { headers });
+      const res = await api.get(`medicamentos/paciente/${id}`);
       setMedicamentos(res.data || []);
     } catch (e) {
       console.log("Error al cargar historial de medicamentos", e);
@@ -316,7 +302,11 @@ function SeguimientoPaciente() {
                 </div>
                 <div>
                   <span style={{ display: "block", fontSize: "12px", color: "#888" }}>Talla</span>
-                  <strong style={{ fontSize: "16px" }}>{signos[0].talla || "--"} m</strong>
+                  <strong style={{ fontSize: "16px" }}>{signos[0].talla || "--"}</strong>
+                </div>
+                <div>
+                  <span style={{ display: "block", fontSize: "12px", color: "#888" }}>Altura</span>
+                  <strong style={{ fontSize: "16px" }}>{signos[0].altura || "--"} m</strong>
                 </div>
                 <div style={{ gridColumn: "1 / -1", marginTop: "5px" }}>
                   <small style={{ color: "#999" }}>

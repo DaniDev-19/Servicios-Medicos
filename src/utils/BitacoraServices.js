@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { BaseUrl }  from './Constans';
+import api from './instanceSesion';
 
 
 /**
@@ -9,13 +8,13 @@ import { BaseUrl }  from './Constans';
 */
 
 export const registrarInicioSesion = (userId, username) => {
-    axios.post(`${BaseUrl}/inicio-sesion`, {usuario: username, usuario_id: userId })
-    .then(()=> {
-        console.log(`Inicio de sesiòn registrado para el usuario con ID: ${userId}`);
-    })
-    .catch((error) => {
-        console.error('Error al registrar inicio de sesión:', error);
-    });
+    api.post('inicio-sesion', { usuario: username, usuario_id: userId })
+        .then(() => {
+            console.log(`Inicio de sesiòn registrado para el usuario con ID: ${userId}`);
+        })
+        .catch((error) => {
+            console.error('Error al registrar inicio de sesión:', error);
+        });
 };
 
 /**
@@ -25,11 +24,11 @@ export const registrarInicioSesion = (userId, username) => {
  */
 
 export const RegistrarCierreSesion = (userId, username) => {
-    axios.post(`${BaseUrl}/cierre-sesion`, {usuario: username, usuario_id: userId})
-    .then(() => {
-        console.log(`Cierre de Sesión registrado para el usuario con el ID: ${userId}`);
-    })
-    .catch((error) => {
-        console.error('Error al registrar cierre de sesión', error);
-    });
+    api.post('cierre-sesion', { usuario: username, usuario_id: userId })
+        .then(() => {
+            console.log(`Cierre de Sesión registrado para el usuario con el ID: ${userId}`);
+        })
+        .catch((error) => {
+            console.error('Error al registrar cierre de sesión', error);
+        });
 };

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import SingleSelect from "../components/SingleSelect";
@@ -28,9 +27,7 @@ function ForReposos({ pacienteId, onSuccess, onCancel, reposoToEdit = null, read
     useEffect(() => {
         const fetchConsultas = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const headers = token ? { Authorization: `Bearer ${token}` } : {};
-                const response = await axios.get(`${BaseUrl}consultas/paciente/${pacienteId}`, { headers });
+                const response = await api.get(`consultas/paciente/${pacienteId}`);
                 const consultasData = response.data || [];
                 setConsultas(consultasData);
 
@@ -103,7 +100,6 @@ function ForReposos({ pacienteId, onSuccess, onCancel, reposoToEdit = null, read
 
         try {
             const token = localStorage.getItem("token");
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
             // Validaciones
             if (!formData.consulta_id) {
@@ -133,10 +129,10 @@ function ForReposos({ pacienteId, onSuccess, onCancel, reposoToEdit = null, read
             };
 
             if (reposoToEdit) {
-                await axios.put(`${BaseUrl}reposos/actualizar/${reposoToEdit.id}`, dataToSend, { headers });
+                await api.put(`reposos/actualizar/${reposoToEdit.id}`, dataToSend);
                 showToast?.("Reposo actualizado correctamente", "success");
             } else {
-                await axios.post(`${BaseUrl}reposos/registrar`, dataToSend, { headers });
+                await api.post('reposos/registrar', dataToSend);
                 showToast?.("Reposo registrado correctamente", "success");
             }
 

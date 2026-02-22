@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import "../index.css";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import { useToast } from "../components/userToasd";
 import { PANTALLAS, ACCIONES } from "../utils/PermisosUser";
 
@@ -60,10 +59,6 @@ function ForRoles({ initialData = {}, onSave, onClose }) {
         }));
     }, [initialData?.id]);
 
-    const headers = useMemo(() => {
-        const token = (localStorage.getItem("token") || "").trim();
-        return token ? { authorization: `Bearer ${token}` } : {};
-    }, []);
 
     const validate = () => {
         if (!form.nombre.trim()) {
@@ -147,14 +142,14 @@ function ForRoles({ initialData = {}, onSave, onClose }) {
         if (!validate()) return;
         setLoading(true);
         try {
-            const res = await axios.post(`${BaseUrl}roles/registrar`, form, { headers });
+            const res = await api.post('roles/registrar', form);
             showToast?.("Rol registrado con éxito", "success");
             onSave?.(res.data);
             onClose?.();
         } catch (error) {
             if (error?.response?.status === 404) {
                 try {
-                    const res2 = await axios.post(`${BaseUrl}roles/resgistrar`, form, { headers });
+                    const res2 = await api.post('roles/resgistrar', form);
                     showToast?.("Rol registrado con éxito", "success");
                     onSave?.(res2.data);
                     onClose?.();
@@ -177,7 +172,7 @@ function ForRoles({ initialData = {}, onSave, onClose }) {
         if (!validate()) return;
         setLoading(true);
         try {
-            const res = await axios.put(`${BaseUrl}roles/actualizar/${initialData.id}`, form, { headers });
+            const res = await api.put(`roles/actualizar/${initialData.id}`, form);
             showToast?.("Rol actualizado correctamente", "success");
             onSave?.(res.data);
             onClose?.();

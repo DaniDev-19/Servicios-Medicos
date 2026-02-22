@@ -1,4 +1,4 @@
-import { useToastContext } from "./ToapsProvider";
+import { useToastContext } from "../utils/toastContext";
 
 export function useToast() {
     const { showToast } = useToastContext();

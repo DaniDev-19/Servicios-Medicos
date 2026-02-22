@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import Spinner from '../components/spinner';
 import icon from '../components/icon';
 import Card from '../components/Card';
@@ -9,7 +9,6 @@ import FormModal from '../components/FormModal';
 import ForCategoria_e from '../Formularios/ForCategoria_e.jsx';
 import Tablas from '../components/Tablas';
 import { useToast } from '../components/userToasd';
-import { BaseUrl } from '../utils/Constans';
 import { useMemo } from 'react';
 import { usePermiso } from '../utils/usePermiso';
 
@@ -28,10 +27,6 @@ function Categoria_e() {
 
     ////////////////////////////Helpers ---> Ayudantes/////////////////////////////////////////////
 
-    const getAuhtorization = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    }
 
     const openConfirmModal = (id) => {
         setSelectedCategoria(id);
@@ -104,7 +99,7 @@ function Categoria_e() {
     const fecthCategoria = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}categoria_e`, { headers: getAuhtorization() });
+            const response = await api.get('categoria_e');
             const data = response.data;
             if (!Array.isArray(data)) {
                 console.warn('Respuesta inesperada /categoria_e', data);
@@ -130,7 +125,7 @@ function Categoria_e() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}categoria_e/ver/${row.id}`, { headers: getAuhtorization() });
+            const response = await api.get(`categoria_e/ver/${row.id}`);
             setCategoriaShow(response.data);
         } catch (error) {
             console.error('error al mostrar datos', error?.response?.data || error.message);
@@ -143,7 +138,7 @@ function Categoria_e() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}categoria_e/eliminar/${id}`, { headers: getAuhtorization() });
+            await api.delete(`categoria_e/eliminar/${id}`);
             ShowToast('Categoria eliminada con exito', 'success', 3000);
             await fecthCategoria();
         } catch (error) {

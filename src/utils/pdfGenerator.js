@@ -675,9 +675,26 @@ export function generateFichaPacientePDF(data) {
 
         doc.rect(startX + (boxWidth * 2), y, boxWidth, boxHeight);
         doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
-        doc.text('Fecha Registro', startX + (boxWidth * 2) + 2, y + 4);
+        doc.text('Altura', startX + (boxWidth * 2) + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`${ultimos.altura || '--'} m`, startX + (boxWidth * 2) + 2, y + 9);
+
+        y += boxHeight;
+        // Fila 3 de cajas
+        doc.rect(startX, y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Talla', startX + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`${ultimos.talla || '--'}`, startX + 2, y + 9);
+
+        doc.rect(startX + boxWidth, y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Fecha Registro', startX + boxWidth + 2, y + 4);
         doc.setFontSize(10); doc.setTextColor(0);
-        doc.text(fechaSignos, startX + (boxWidth * 2) + 2, y + 9);
+        doc.text(fechaSignos, startX + boxWidth + 2, y + 9);
+
+        doc.rect(startX + (boxWidth * 2), y, boxWidth, boxHeight);
+        // Espacio vacío o algo más
 
         y += boxHeight + 10;
     } else {
@@ -1660,3 +1677,303 @@ export function generateHistorialMedicamentosPDF({ paciente, medicamentos }) {
     return doc.output('blob');
 }
 
+
+// ==================== REPORTE DE INVENTARIO ACTUAL ====================
+export function generateInventarioPDF(medicamentos) {
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
+
+    // Header
+    try {
+        doc.addImage(cintillo, 'PNG', margin, y, pageWidth - (margin * 2), 20);
+        y += 30;
+    } catch (e) { y += 20; }
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 160);
+    doc.text('REPORTE DE INVENTARIO ACTUAL - FARMACIA', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Fecha de Emisión: ${new Date().toLocaleString('es-VE')}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    const columns = [
+        { header: 'Medicamento', dataKey: 'nombre' },
+        { header: 'Presentación', dataKey: 'presentacion' },
+        { header: 'Miligramos', dataKey: 'miligramos' },
+        { header: 'Stock', dataKey: 'cantidad' },
+        { header: 'Estatus', dataKey: 'estatus' }
+    ];
+
+    const body = medicamentos.map(m => ({
+        nombre: m.nombre,
+        presentacion: m.presentacion || '-',
+        miligramos: m.miligramos || '-',
+        cantidad: m.cantidad_disponible,
+        estatus: (m.estatus || 'disponible').toUpperCase()
+    }));
+
+    autoTable(doc, {
+        startY: y,
+        head: [columns.map(c => c.header)],
+        body: body.map(row => columns.map(c => row[c.dataKey])),
+        theme: 'grid',
+        headStyles: { fillColor: [0, 51, 160], textColor: 255, fontSize: 10 },
+        styles: { fontSize: 9 },
+        didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 4) {
+                const estatus = data.cell.raw;
+                if (estatus === 'AGOTADO') doc.setTextColor(200, 0, 0);
+                else if (estatus === 'EXISTENCIA BAJA') doc.setTextColor(255, 140, 0);
+                else doc.setTextColor(0, 128, 0);
+            }
+        },
+        margin: { left: margin, right: margin }
+    });
+
+    return doc.output('blob');
+}
+
+// ==================== KÁRDEX DE MOVIMIENTOS ====================
+export function generateKardexPDF(movimientos) {
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
+
+    // Header
+    try {
+        doc.addImage(cintillo, 'PNG', margin, y, pageWidth - (margin * 2), 20);
+        y += 30;
+    } catch (e) { y += 20; }
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 160);
+    doc.text('KÁRDEX DE MOVIMIENTOS DE INVENTARIO', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generado: ${new Date().toLocaleString('es-VE')}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    autoTable(doc, {
+        startY: y,
+        head: [['Fecha', 'Tipo', 'Cant.', 'Medicamento', 'Usuario', 'Motivo']],
+        body: movimientos.map(m => [
+            new Date(m.fecha).toLocaleDateString('es-VE'),
+            (m.tipo_movimiento || '').toUpperCase(),
+            m.cantidad,
+            m.medicamento,
+            m.usuario || 'Sistema',
+            m.motivo || '-'
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [0, 51, 160], textColor: 255 },
+        styles: { fontSize: 8 },
+        didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 1) {
+                if (data.cell.raw === 'ENTRADA') doc.setTextColor(0, 128, 0);
+                else doc.setTextColor(200, 0, 0);
+            }
+        },
+        margin: { left: margin, right: margin }
+    });
+
+    return doc.output('blob');
+}
+
+// ==================== REPORTE EPIDEMIOLÓGICO (MORBILIDAD) ====================
+export function generateEpidemiologicoPDF(data) {
+    const { patologias, totalConsultas, periodo } = data;
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    let y = margin;
+
+    // Header
+    try {
+        doc.addImage(cintillo, 'PNG', margin, y, pageWidth - (margin * 2), 20);
+        y += 30;
+    } catch (e) { y += 20; }
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 160);
+    doc.text('REPORTE EPIDEMIOLÓGICO DE MORBILIDAD', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Periodo: ${periodo || 'Histórico General'}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    // Resumen General
+    doc.setFillColor(240, 240, 240);
+    doc.rect(margin, y, pageWidth - (margin * 2), 12, 'F');
+    doc.setFontSize(11);
+    doc.setTextColor(0);
+    doc.text(`Total de Consultas Atendidas en el Periodo: ${totalConsultas}`, margin + 5, y + 8);
+    y += 18;
+
+    // Tabla de Patologías
+    autoTable(doc, {
+        startY: y,
+        head: [['#', 'Patología / Enfermedad', 'Frecuencia (Casos)', 'Prevalencia (%)']],
+        body: patologias.map((p, i) => [
+            i + 1,
+            p.nombre.toUpperCase(),
+            p.cantidad,
+            `${((p.cantidad / totalConsultas) * 100).toFixed(2)}%`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [0, 51, 160], textColor: 255 },
+        columnStyles: {
+            0: { cellWidth: 10 },
+            1: { cellWidth: 100 },
+            2: { cellWidth: 40, halign: 'center' },
+            3: { cellWidth: 35, halign: 'center' }
+        },
+        margin: { left: margin, right: margin }
+    });
+
+    return doc.output('blob');
+}
+
+// ==================== REPORTE DE AUSENTISMO POR DEPARTAMENTO ====================
+export function generateAusentismoPDF(data) {
+    const { departamentos, totalDiasGlobal, periodo } = data;
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    let y = margin;
+
+    // Header
+    try {
+        doc.addImage(cintillo, 'PNG', margin, y, pageWidth - (margin * 2), 20);
+        y += 30;
+    } catch (e) { y += 20; }
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 160);
+    doc.text('REPORTE DE AUSENTISMO LABORAL (REPOSOS)', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Análisis por Departamento - Periodo: ${periodo || 'Todo'}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    autoTable(doc, {
+        startY: y,
+        head: [['Departamento / Unidad', 'N° Pacientes en Reposo', 'Total Días Acumulados', 'Impacto (%)']],
+        body: departamentos.map(d => [
+            d.nombre.toUpperCase(),
+            d.cantidad_pacientes,
+            d.total_dias,
+            `${((d.total_dias / totalDiasGlobal) * 100).toFixed(2)}%`
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [180, 0, 0], textColor: 255 },
+        styles: { fontSize: 9 },
+        margin: { left: margin, right: margin }
+    });
+
+    return doc.output('blob');
+}
+
+// ==================== REPORTE DE PRODUCTIVIDAD MÉDICA ====================
+export function generateProductividadPDF(data) {
+    const { doctores, periodo } = data;
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    let y = margin;
+
+    // Header
+    try {
+        doc.addImage(cintillo, 'PNG', margin, y, pageWidth - (margin * 2), 20);
+        y += 35;
+    } catch (e) { y += 25; }
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 160);
+    doc.text('REPORTE DE PRODUCTIVIDAD Y EFICIENCIA MÉDICA', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Periodo: ${periodo || 'Histórico'}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    autoTable(doc, {
+        startY: y,
+        head: [['Médico', 'Citas Prog.', 'Citas Realizadas', 'Citas Canceladas', 'Eficiencia (%)']],
+        body: doctores.map(d => [
+            `${d.nombre} ${d.apellido}`.toUpperCase(),
+            d.total_programadas,
+            d.total_realizadas,
+            d.total_canceladas,
+            `${((d.total_realizadas / (d.total_programadas || 1)) * 100).toFixed(1)}%`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [0, 102, 204], textColor: 255 },
+        styles: { fontSize: 8 },
+        margin: { left: margin, right: margin }
+    });
+
+    return doc.output('blob');
+}
+
+// ==================== REPORTE DE AUDITORÍA (BITÁCORA) ====================
+export function generateAuditoriaPDF(registros) {
+    const doc = new jsPDF({ format: 'letter', orientation: 'landscape', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    let y = margin;
+
+    // Header simple para landscape
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(0, 51, 160);
+    doc.text('REPORTE DE AUDITORÍA DE SISTEMA (BITÁCORA)', margin, y + 10);
+    doc.setFontSize(8);
+    doc.setTextColor(100);
+    doc.text(`Fecha de Reporte: ${new Date().toLocaleString('es-VE')}`, margin, y + 15);
+    y += 20;
+
+    autoTable(doc, {
+        startY: y,
+        head: [['Fecha/Hora', 'Usuario', 'Acción', 'Tabla', 'Descripción']],
+        body: registros.map(r => [
+            new Date(r.fecha).toLocaleString('es-VE'),
+            r.usuario,
+            r.accion.toUpperCase(),
+            r.tabla.toUpperCase(),
+            r.descripcion
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [50, 50, 50], textColor: 255 },
+        styles: { fontSize: 7, overflow: 'linebreak' },
+        columnStyles: {
+            0: { cellWidth: 35 },
+            1: { cellWidth: 25 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 'auto' }
+        },
+        margin: { left: margin, right: margin }
+    });
+
+    return doc.output('blob');
+}

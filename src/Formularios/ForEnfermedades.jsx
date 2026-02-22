@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../index.css';
-import axios from 'axios';
-import { BaseUrl } from '../utils/Constans';
+import api from '../utils/instanceSesion';
 import { validateField, getValidationRule } from '../utils/validation';
 import Spinner from '../components/spinner';
 import { useToast } from '../components/userToasd';
@@ -22,10 +21,6 @@ function ForEnfermedades({ initialData = {}, onSave, onClose }) {
     const [categoria, setCategoria] = useState([]);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const getAuthorization = () => {
-        const token = (localStorage.getItem("token") || "").trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    }
 
     const validate = (field, value) => {
         if (field === "confirmPassword") {
@@ -67,7 +62,7 @@ function ForEnfermedades({ initialData = {}, onSave, onClose }) {
     const fetchCatalogos = async () => {
         setLoading(true);
         try {
-            const categoria = await axios.get(`${BaseUrl}enfermedades/All_categorias_e`, { headers: getAuthorization() });
+            const categoria = await api.get('enfermedades/All_categorias_e');
             setCategoria(categoria.data);
         } catch (error) {
             console.error('Error al cargar catalogos', error);
@@ -90,7 +85,7 @@ function ForEnfermedades({ initialData = {}, onSave, onClose }) {
         }
         setLoading(true);
         try {
-            const response = await axios.post(`${BaseUrl}enfermedades/registrar`, form, { headers: getAuthorization() });
+            const response = await api.post('enfermedades/registrar', form);
             showToast?.("registro exitoso", "success");
             if (onSave) onSave(response.data);
             if (onClose) onClose();
@@ -111,7 +106,7 @@ function ForEnfermedades({ initialData = {}, onSave, onClose }) {
         setLoading(true);
 
         try {
-            const response = await axios.put(`${BaseUrl}enfermedades/actualizar/${initialData.id}`, form, { headers: getAuthorization() });
+            const response = await api.put(`enfermedades/actualizar/${initialData.id}`, form);
             showToast?.('Registro exitoso', 'success');
             if (onSave) onSave(response.data);
             if (onClose) onClose();

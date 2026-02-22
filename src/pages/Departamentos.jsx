@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import "../index.css";
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import InfoModal from "../components/InfoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
 import ForDepartamento from "../Formularios/ForDepartamento";
 import { exportToPDF, exportToExcel } from "../utils/exportUtils";
+import { generateAusentismoPDF } from "../utils/pdfGenerator";
 import { usePermiso } from '../utils/usePermiso';
 
 function Departamentos() {
@@ -30,15 +30,11 @@ function Departamentos() {
     const [verRow, setVerRow] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
 
-    const getAuthHeaders = () => {
-        const token = (localStorage.getItem("token") || "").trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
 
     const fetchDepartamentos = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${BaseUrl}departamentos`, { headers: getAuthHeaders() });
+            const res = await api.get('departamentos');
             const data = Array.isArray(res.data) ? res.data : [];
             setDepartamentos(data);
         } catch (err) {
@@ -66,7 +62,7 @@ function Departamentos() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}departamentos/eliminar/${id}`, { headers: getAuthHeaders() });
+            await api.delete(`departamentos/eliminar/${id}`);
             showToast?.("Departamento eliminado con éxito", "success", 3000);
             await fetchDepartamentos();
         } catch (err) {
@@ -96,7 +92,7 @@ function Departamentos() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const res = await axios.get(`${BaseUrl}departamentos/ver/${row.id}`, { headers: getAuthHeaders() });
+            const res = await api.get(`departamentos/ver/${row.id}`);
             setVerRow(res.data);
         } catch (err) {
             console.error("Error al ver departamento:", err);
@@ -187,6 +183,23 @@ function Departamentos() {
         }
     };
 
+    const handleAusentismoPDF = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get('reportes/ausentismo');
+            const docBlob = generateAusentismoPDF(res.data);
+            if (docBlob) {
+                const url = URL.createObjectURL(docBlob);
+                setPdfUrl(url);
+            }
+        } catch (err) {
+            console.error("Error generando reporte de ausentismo:", err);
+            showToast?.("Error al generar el reporte gerencial", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleExportExcel = () => {
         exportToExcel({
             data: filtered,
@@ -266,12 +279,13 @@ function Departamentos() {
                     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
                 }}
                 title="Vista previa PDF"
+                size="pdf"
             >
                 {pdfUrl && (
                     <iframe
                         src={pdfUrl}
                         title="Vista previa PDF"
-                        style={{ width: "100%", height: "70vh", border: "none" }}
+                        style={{ width: "100%", height: "85vh", border: "none" }}
                     />
                 )}
                 <div style={{ marginTop: 16, textAlign: "right" }}>
@@ -322,6 +336,11 @@ function Departamentos() {
                         {TienePermiso('departamentos', 'exportar') && (
                             <button className="btn btn-secondary" onClick={handlePreviewPDF}>
                                 <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
+                            </button>
+                        )}
+                        {TienePermiso('departamentos', 'exportar') && (
+                            <button className="btn btn-secondary" onClick={handleAusentismoPDF} title="Reporte Gerencial de Ausentismo">
+                                <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5, filter: 'hue-rotate(150deg)' }} /> Ausentismo
                             </button>
                         )}
                         {TienePermiso('departamentos', 'exportar') && (

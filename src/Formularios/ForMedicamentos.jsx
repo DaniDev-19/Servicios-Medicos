@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../index.css";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import Spinner from "../components/spinner";
 import { useToast } from "../components/userToasd";
 import SingleSelect from "../components/SingleSelect";
@@ -28,10 +27,6 @@ function ForMedicamentos({ initialData = {}, onSave, onClose }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem("token") || "").trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const PRESENTACION_OPTIONS = [
     { value: "Tabletas", label: "Tabletas" },
@@ -48,7 +43,7 @@ function ForMedicamentos({ initialData = {}, onSave, onClose }) {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await axios.get(`${BaseUrl}${CATEGORIA_ENDPOINT}`, { headers: getAuthHeaders() });
+        const res = await api.get(CATEGORIA_ENDPOINT);
         setCategorias(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Error cargando categorías:", err?.response?.data || err.message);
@@ -111,13 +106,12 @@ function ForMedicamentos({ initialData = {}, onSave, onClose }) {
     }
     setLoading(true);
     try {
-      const headers = getAuthHeaders();
       const payload = {
         ...form,
         cantidad_disponible: Number(form.cantidad_disponible) || 0,
         estatus: deriveEstatus(Number(form.cantidad_disponible)),
       };
-      const res = await axios.post(`${BaseUrl}medicamentos/registrar`, payload, { headers });
+      const res = await api.post('medicamentos/registrar', payload);
       showToast?.("Medicamento registrado correctamente", "success");
       onSave?.(res.data);
       onClose?.();
@@ -138,13 +132,12 @@ function ForMedicamentos({ initialData = {}, onSave, onClose }) {
     }
     setLoading(true);
     try {
-      const headers = getAuthHeaders();
       const payload = {
         ...form,
         cantidad_disponible: Number(form.cantidad_disponible) || 0,
         estatus: deriveEstatus(Number(form.cantidad_disponible)),
       };
-      const res = await axios.put(`${BaseUrl}medicamentos/actualizar/${initialData.id}`, payload, { headers });
+      const res = await api.put(`medicamentos/actualizar/${initialData.id}`, payload);
       showToast?.("Medicamento actualizado correctamente", "success");
       onSave?.(res.data);
       onClose?.();

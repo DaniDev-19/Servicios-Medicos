@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
-import axios from 'axios';
-import { BaseUrl } from '../utils/Constans';
+import api from '../utils/instanceSesion';
 import Spinner from "../components/spinner";
-// import icon from "../components/icon";
+import icon from "../components/icon";
 import Table from "../components/Tablas";
 import InfoModal from "../components/InfoModal";
+import FormModal from "../components/FormModal";
+import { generateAuditoriaPDF } from "../utils/pdfGenerator";
 import { useToast } from "../components/userToasd";
 import { usePermiso } from "../utils/usePermiso";
 
@@ -14,12 +15,9 @@ function Bitacora() {
     const [showBitacora, setShowBitacora] = useState(null);
     const [bitacora, setBitacora] = useState([]);
     const [filters, setFilters] = useState({ estado: "todos", q: "" });
+    const [pdfUrl, setPdfUrl] = useState(null);
     const ShowToast = useToast();
 
-    const getAuthorization = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token} ` } : {};
-    }
 
     const filtered = useMemo(() => {
         const q = filters.q.trim().toLowerCase();
@@ -37,7 +35,7 @@ function Bitacora() {
     const handleVerDetalle = async (id) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}bitacora/${id}`, { headers: getAuthorization() });
+            const response = await api.get(`bitacora/${id}`);
             setShowBitacora(response.data);
         } catch (error) {
             ShowToast?.('Error al obtener detalles', 'error');
@@ -69,7 +67,7 @@ function Bitacora() {
     const fecthBitacora = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}bitacora`, { headers: getAuthorization() });
+            const response = await api.get('bitacora');
             const data = response.data;
             if (!Array.isArray(data)) {
                 console.warn('Respuesta inesperada /bitacora', data);
@@ -107,6 +105,14 @@ function Bitacora() {
             return cleaned;
         }
         return data;
+    };
+
+    const handleExportPDF = () => {
+        const docBlob = generateAuditoriaPDF(filtered);
+        if (docBlob) {
+            const url = URL.createObjectURL(docBlob);
+            setPdfUrl(url);
+        }
     };
 
     return (
@@ -199,9 +205,30 @@ function Bitacora() {
                 )}
             </InfoModal>
 
-            {/* <section className="quick-actions2">
-                <div className="pac-toolbar">
-                    <div className="field">
+            <FormModal
+                isOpen={!!pdfUrl}
+                onClose={() => {
+                    setPdfUrl(null);
+                    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+                }}
+                title="Vista previa PDF - Bitácora"
+                size="pdf"
+            >
+                {pdfUrl && (
+                    <iframe
+                        src={pdfUrl}
+                        title="Vista previa PDF"
+                        style={{ width: "100%", height: "85vh", border: "none" }}
+                    />
+                )}
+                <div style={{ marginTop: 16, textAlign: "right" }}>
+                    <a href={pdfUrl} download="bitacora_yutong.pdf" className="btn btn-primary">Descargar PDF</a>
+                </div>
+            </FormModal>
+
+            <section className="quick-actions2" style={{ marginBottom: 15 }}>
+                <div className="pac-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="field" style={{ flex: 1, marginRight: 20 }}>
                         <img src={icon.lupa2} alt="Buscador...." className="field-icon" />
                         <input
                             type="text"
@@ -210,8 +237,14 @@ function Bitacora() {
                             onChange={(e) => setFilters(f => ({ ...f, q: e.target.value }))}
                         />
                     </div>
+                    {TienePermiso('bitacora', 'exportar') && (
+                        <button className="btn btn-secondary" onClick={handleExportPDF}>
+                            <img src={icon.pdf1} className="btn-icon" alt="" style={{ marginRight: 5 }} />
+                            Exportar Auditoría
+                        </button>
+                    )}
                 </div>
-            </section> */}
+            </section>
 
             <div className="table-wrap">
                 <Table

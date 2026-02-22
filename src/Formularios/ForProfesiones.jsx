@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BaseUrl } from '../utils/Constans';
+import api from '../utils/instanceSesion';
 import { useToast } from '../components/userToasd';
 import Spinner from '../components/spinner';
 import '../index.css';
@@ -32,22 +31,11 @@ function ForProfesiones({ profesionToEdit = null, onSuccess, onCancel }) {
         setLoading(true);
 
         try {
-            const token = localStorage.getItem('token');
-            const headers = { Authorization: `Bearer ${token}` };
-
             if (profesionToEdit) {
-                await axios.put(
-                    `${BaseUrl}profesion/actualizar/${profesionToEdit.id}`,
-                    formData,
-                    { headers }
-                );
+                await api.put(`profesion/actualizar/${profesionToEdit.id}`, formData);
                 showToast?.('Profesión actualizada correctamente', 'success', 3000);
             } else {
-                await axios.post(
-                    `${BaseUrl}profesion/registrar`,
-                    formData,
-                    { headers }
-                );
+                await api.post('profesion/registrar', formData);
                 showToast?.('Profesión registrada correctamente', 'success', 3000);
             }
 

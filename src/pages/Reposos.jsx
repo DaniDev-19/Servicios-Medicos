@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import InfoModal from "../components/InfoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
@@ -40,11 +39,6 @@ function Reposos() {
 
   const [filters, setFilters] = useState({ q: "", estado: "todos", periodo: "todos" });
 
-  // Helpers
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const periodoOptions = [
     { value: "todos", label: "Todo el tiempo" },
@@ -56,7 +50,7 @@ function Reposos() {
   const fetchReposos = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BaseUrl}reposos`, { headers: getAuthHeaders() });
+      const response = await api.get('reposos');
       const data = response.data;
       if (Array.isArray(data)) {
         setReposos(data);
@@ -73,7 +67,7 @@ function Reposos() {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get(`${BaseUrl}historias_medicas/pacientes-lista`, { headers: getAuthHeaders() });
+      const response = await api.get('historias_medicas/pacientes-lista');
       if (Array.isArray(response.data)) {
         const options = response.data.map(p => ({
           value: p.id,
@@ -88,7 +82,7 @@ function Reposos() {
 
   const updateStatuses = async () => {
     try {
-      await axios.get(`${BaseUrl}reposos/actualizar-estados`, { headers: getAuthHeaders() });
+      await api.get('reposos/actualizar-estados');
     } catch (error) {
       console.error('Error actualizando estados:', error);
     }
@@ -117,7 +111,7 @@ function Reposos() {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await axios.delete(`${BaseUrl}reposos/eliminar/${selectedReposoId}`, { headers: getAuthHeaders() });
+      await api.delete(`reposos/eliminar/${selectedReposoId}`);
       showToast?.('Reposo eliminado con éxito', 'success');
       fetchReposos();
     } catch (error) {
@@ -408,12 +402,13 @@ function Reposos() {
           if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         }}
         title="Vista previa PDF"
+        size="pdf"
       >
         {pdfUrl && (
           <iframe
             src={pdfUrl}
             title="Vista previa PDF"
-            style={{ width: "100%", height: "70vh", border: "none" }}
+            style={{ width: "100%", height: "85vh", border: "none" }}
           />
         )}
         <div style={{ marginTop: 16, textAlign: "right" }}>

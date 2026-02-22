@@ -21,6 +21,7 @@ import Bitacora from './pages/Bitacora.jsx';
 import Enfermedades from './pages/Enfermedades.jsx';
 import Citas from './pages/Citas.jsx';
 import Atenciones from './pages/Atenciones.jsx';
+import Valoracion from './pages/Valoracion.jsx';
 ////////////////////////// PANTALLAS FORMULARIOS ///////////////////////////////////////////////////////////
 import ForConsultas from './Formularios/ForConsultas';
 import ForPacientes from './Formularios/ForPaciente.jsx';
@@ -38,7 +39,7 @@ import ForCitas from './Formularios/ForCitas.jsx';
 ///////////////////////// COMPONENTES //////////////////////////
 import MainLayout from './components/MainLayout.jsx';
 import { AlertProvider } from './components/AlertProvider.jsx';
-import { ToastProvider } from './components/ToapsProvider.jsx';
+import { ToastProvider } from './components/ToastProvider.jsx';
 import AutoLogout from './components/AutoLogout.jsx';
 import ProtectedRoute from './utils/ProtectedRoute.jsx';
 ////////////////////////// IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////////////////////////
@@ -243,6 +244,11 @@ function App() {
                 <Route path='ForCitas' element={
                   <ProtectedRoute pantalla='citas'>
                     <ForCitas />
+                  </ProtectedRoute>
+                } />
+                <Route path='Valoracion' element={
+                  <ProtectedRoute pantalla='home' >
+                    <Valoracion />
                   </ProtectedRoute>
                 } />
               </Route>

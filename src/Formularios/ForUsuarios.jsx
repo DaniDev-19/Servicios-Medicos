@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "../index.css";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import Spinner from "../components/spinner";
 import { useToast } from "../components/userToasd";
 import SingleSelect from "../components/SingleSelect";
@@ -40,10 +39,6 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
     });
   }, [initialData?.id]);
 
-  const headers = useMemo(() => {
-    const token = (localStorage.getItem("token") || "").trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
 
   // Cargar catálogos
   useEffect(() => {
@@ -51,8 +46,8 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
       setLoading(true);
       try {
         const [rRes, dRes] = await Promise.all([
-          axios.get(`${BaseUrl}usuarios/catalogos/roles`, { headers }),
-          axios.get(`${BaseUrl}usuarios/catalogos/doctores`, { headers }),
+          api.get('usuarios/catalogos/roles'),
+          api.get('usuarios/catalogos/doctores'),
         ]);
         setRoles(rRes.data || []);
         setDoctores(dRes.data || []);
@@ -64,44 +59,44 @@ function ForUsuarios({ initialData = {}, onSave, onClose }) {
       }
     };
     load();
-  }, [headers, showToast]);
+  }, [showToast]);
 
-// Validación de campos
-const validate = (field, value) => {
-  if (field === "confirmPassword") {
-    return value !== form.password ? "Las contraseñas no coinciden" : "";
-  }
-  const rule = getValidationRule(field);
-  if (rule && rule.regex) {
-    const result = validateField(value, { text: v => rule.regex.test(v) }, rule.errorMessage);
-    return result.valid ? "" : result.message;
-  }
-  return "";
-};
+  // Validación de campos
+  const validate = (field, value) => {
+    if (field === "confirmPassword") {
+      return value !== form.password ? "Las contraseñas no coinciden" : "";
+    }
+    const rule = getValidationRule(field);
+    if (rule && rule.regex) {
+      const result = validateField(value, { text: v => rule.regex.test(v) }, rule.errorMessage);
+      return result.valid ? "" : result.message;
+    }
+    return "";
+  };
 
-const handleChange = (e) => {
-const { name, value, type, checked } = e.target;
-setForm((prev) => ({
-    ...prev,
-    [name]: type === "checkbox" ? checked : value,
-}));
-setErrors((prev) => ({
-    ...prev,
-    [name]: validate(name, type === "checkbox" ? checked : value),
-}));
-};
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: validate(name, type === "checkbox" ? checked : value),
+    }));
+  };
 
 
-const validateAll = () => {
+  const validateAll = () => {
     const newErrors = {};
     Object.keys(form).forEach((field) => {
-    if (field === "estado") return;
-    const err = validate(field, form[field]);
-    if (err) newErrors[field] = err;
+      if (field === "estado") return;
+      const err = validate(field, form[field]);
+      if (err) newErrors[field] = err;
     });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-};
+  };
 
   const handleClear = () => {
     setForm({
@@ -114,7 +109,7 @@ const validateAll = () => {
       estatus: "activo",
       estado: true
     });
-      setErrors({});
+    setErrors({});
   };
 
   const handleSave = async (e) => {
@@ -122,10 +117,10 @@ const validateAll = () => {
     if (!validateAll()) {
       showToast?.("Corrige los errores antes de guardar", "warning");
       return;
-      }
+    }
     setLoading(true);
     try {
-      const res = await axios.post(`${BaseUrl}usuarios/registrar`, form, { headers });
+      const res = await api.post('usuarios/registrar', form);
       showToast?.("Usuario registrado con éxito", "success");
       onSave?.(res.data);
       onClose?.();
@@ -140,13 +135,13 @@ const validateAll = () => {
   const handleEdit = async (e) => {
     e.preventDefault();
     if (!validateAll()) {
-    showToast?.("Corrige los errores antes de guardar", "warning");
-    return;
+      showToast?.("Corrige los errores antes de guardar", "warning");
+      return;
     }
     setLoading(true);
     try {
       console.log("Editando usuario:", initialData.id, form);
-      const res = await axios.put(`${BaseUrl}usuarios/actualizar/${initialData.id}`, form, { headers });
+      const res = await api.put(`usuarios/actualizar/${initialData.id}`, form);
       showToast?.("Usuario actualizado correctamente", "success");
       onSave?.(res.data);
       onClose?.();
@@ -186,36 +181,36 @@ const validateAll = () => {
           {errors.correo && <span style={{ color: "red" }}>{errors.correo}</span>}
         </div>
 
-        
-          <div className="fc-field">
-            <label><span className="unique">*</span>Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required={!isEdit}
-            />
-          {errors.password && <span style={{color: 'red'}}>{errors.password}</span> }
-          </div>
 
-          <div className="fc-field">
-            <label>Confirmar contraseña</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="Repite la nueva contraseña"
-              required={!!form.password}
-            />
-            {errors.confirmPassword && <span style={{color: 'red'}}>{errors.confirmPassword}</span>}
-          </div>
-        
+        <div className="fc-field">
+          <label><span className="unique">*</span>Contraseña</label>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="••••••••"
+            required={!isEdit}
+          />
+          {errors.password && <span style={{ color: 'red' }}>{errors.password}</span>}
+        </div>
 
-       
-          {/* <div className="fc-field">
+        <div className="fc-field">
+          <label>Confirmar contraseña</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            placeholder="Repite la nueva contraseña"
+            required={!!form.password}
+          />
+          {errors.confirmPassword && <span style={{ color: 'red' }}>{errors.confirmPassword}</span>}
+        </div>
+
+
+
+        {/* <div className="fc-field">
             <label>Nueva contraseña (opcional)</label>
             <input
               type="password"
@@ -226,7 +221,7 @@ const validateAll = () => {
             />
             {errors.password && <span style={{color: 'red'}}>{errors.password}</span>}
           </div> */}
-        
+
 
         <div className="fc-field">
           <label><span className="unique">*</span>Rol</label>
@@ -246,9 +241,9 @@ const validateAll = () => {
             value={
               doctores.find(d => d.id === form.doctor_id)
                 ? {
-                    value: form.doctor_id,
-                    label: `${doctores.find(d => d.id === form.doctor_id)?.nombre} ${doctores.find(d => d.id === form.doctor_id)?.apellido} (${doctores.find(d => d.id === form.doctor_id)?.cedula})`
-                  }
+                  value: form.doctor_id,
+                  label: `${doctores.find(d => d.id === form.doctor_id)?.nombre} ${doctores.find(d => d.id === form.doctor_id)?.apellido} (${doctores.find(d => d.id === form.doctor_id)?.cedula})`
+                }
                 : null
             }
             onChange={(opt) => setForm((p) => ({ ...p, doctor_id: opt ? opt.value : null }))}

@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import FormModal from "../components/FormModal";
 import ForAtenciones from "../Formularios/ForAtenciones";
 import ConfirmModal from '../components/ConfirmModal'
@@ -34,8 +33,7 @@ function Atenciones() {
     const fetchAtenciones = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${BaseUrl}atenciones`, { headers: { Authorization: `Bearer ${token}` } });
+            const response = await api.get('atenciones');
             setAtenciones(response.data);
         } catch (error) {
             console.error(error);
@@ -67,8 +65,7 @@ function Atenciones() {
     const handleDelete = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${BaseUrl}atenciones/eliminar/${selectedIdToDelete}`, { headers: { Authorization: `Bearer ${token}` } });
+            await api.delete(`atenciones/eliminar/${selectedIdToDelete}`);
             showToast("Atención eliminada", "success");
             fetchAtenciones();
         } catch (error) {
@@ -289,12 +286,13 @@ function Atenciones() {
                     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
                 }}
                 title="Vista previa PDF"
+                size="pdf"
             >
                 {pdfUrl && (
                     <iframe
                         src={pdfUrl}
                         title="Vista previa PDF"
-                        style={{ width: "100%", height: "70vh", border: "none" }}
+                        style={{ width: "100%", height: "85vh", border: "none" }}
                     />
                 )}
 

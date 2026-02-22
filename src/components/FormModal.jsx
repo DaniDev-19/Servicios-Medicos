@@ -8,14 +8,18 @@ function FormModal({
   children,
   animation = "fade",
   width = "",
-  showClose = true
+  showClose = true,
+  className = "",
+  size = "normal"
 }) {
   if (!isOpen) return null;
+
+  const contentClass = size === "pdf" ? styles["modal-pdf"] : (className || styles["modal-content"]);
 
   return (
     <div className={styles["modal-overlay"]} onClick={onClose}>
       <div
-        className={`${styles["modal-content"]} ${styles[animation] || ""}`}
+        className={`${contentClass} ${styles[animation] || ""}`}
         style={{ width }}
         onClick={e => e.stopPropagation()}
       >

@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import InfoModal from "../components/InfoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
@@ -40,17 +39,12 @@ function Historias() {
 
   const [filters, setFilters] = useState({ q: "" });
 
-  // Helpers
-  const getAuthHeaders = () => {
-    const token = (localStorage.getItem('token') || '').trim();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   // --- Fetch Data ---
   const fetchHistorias = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BaseUrl}historias_medicas`, { headers: getAuthHeaders() });
+      const response = await api.get('historias_medicas');
       const data = response.data;
       if (Array.isArray(data)) {
         setHistorias(data);
@@ -68,7 +62,7 @@ function Historias() {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get(`${BaseUrl}historias_medicas/pacientes-lista`, { headers: getAuthHeaders() });
+      const response = await api.get('historias_medicas/pacientes-lista');
       if (Array.isArray(response.data)) {
         const options = response.data.map(p => ({
           value: p.id,
@@ -96,7 +90,7 @@ function Historias() {
     }
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}historias_medicas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`historias_medicas/ver/${row.id}`);
       setHistoriaToShow(res.data);
     } catch (error) {
       console.error('Error al ver historia:', error);
@@ -119,7 +113,7 @@ function Historias() {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await axios.delete(`${BaseUrl}historias_medicas/eliminar/${selectedHistoriaId}`, { headers: getAuthHeaders() });
+      await api.delete(`historias_medicas/eliminar/${selectedHistoriaId}`);
       showToast?.('Historia eliminada con éxito', 'success');
       fetchHistorias();
     } catch (error) {
@@ -147,7 +141,7 @@ function Historias() {
     }
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}historias_medicas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`historias_medicas/ver/${row.id}`);
       const fullData = res.data;
 
       setEditHistoria(fullData);
@@ -178,7 +172,7 @@ function Historias() {
     if (!row.id) return;
     setLoading(true);
     try {
-      const res = await axios.get(`${BaseUrl}historias_medicas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const res = await api.get(`historias_medicas/ver/${row.id}`);
       const fullData = res.data;
 
       const docBlob = generateHistoriaClinicaPDF(fullData);
@@ -400,12 +394,13 @@ function Historias() {
           if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         }}
         title="Vista previa PDF"
+        size="pdf"
       >
         {pdfUrl && (
           <iframe
             src={pdfUrl}
             title="Vista previa PDF"
-            style={{ width: "100%", height: "70vh", border: "none" }}
+            style={{ width: "100%", height: "85vh", border: "none" }}
           />
         )}
         <div style={{ marginTop: 16, textAlign: "right" }}>

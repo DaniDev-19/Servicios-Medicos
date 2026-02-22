@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import '../index.css';
-import { BaseUrl } from '../utils/Constans';
+import api from '../utils/instanceSesion';
 import { validateField, validationRules } from '../utils/validation';
 import Spinner from '../components/spinner';
 import { useToast } from '../components/userToasd';
@@ -55,10 +53,6 @@ function ForCategoria_m({ initialData = {}, onSave, onClose }) {
         setErrors({});
     }
 
-    const getAuthorization = () => {
-        const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    }
     /////////////////////////////// Fin Helpers o ayudantes para validaciones entre otros ///////////////////////
 
     //////////////////////////////////////////////////Peticiones o Solicitudes/////////////////////////////////////////////////// 
@@ -71,7 +65,7 @@ function ForCategoria_m({ initialData = {}, onSave, onClose }) {
         }
         setLoading(true);
         try {
-            const response = await axios.post(`${BaseUrl}categoria_m/registrar`, form, { headers: getAuthorization() });
+            const response = await api.post('categoria_m/registrar', form);
             ShowToast?.('Categoria registrada con exito', 'success');
             if (onSave) onSave(response.data);
             if (onClose) onClose();
@@ -91,7 +85,7 @@ function ForCategoria_m({ initialData = {}, onSave, onClose }) {
         }
         setLoading(true);
         try {
-            const response = await axios.put(`${BaseUrl}categoria_m/actualizar/${initialData.id}`, form, { headers: getAuthorization() });
+            const response = await api.put(`categoria_m/actualizar/${initialData.id}`, form);
             ShowToast?.('categoria actualizada con exito', 'success');
             if (onSave) onSave(response.data);
             if (onClose) onClose();

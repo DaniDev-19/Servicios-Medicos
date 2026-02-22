@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import Spinner from "../components/spinner";
 
 function DetalleConsulta({ consultaId, onClose }) {
@@ -12,9 +11,7 @@ function DetalleConsulta({ consultaId, onClose }) {
     useEffect(() => {
         const fetchConsulta = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const headers = token ? { Authorization: `Bearer ${token}` } : {};
-                const response = await axios.get(`${BaseUrl}consultas/ver/${consultaId}`, { headers });
+                const response = await api.get(`consultas/ver/${consultaId}`);
                 setConsulta(response.data);
             } catch (err) {
                 console.error("Error cargando consulta:", err);

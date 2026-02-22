@@ -1,5 +1,5 @@
 export const PANTALLAS = [
-    { key: 'home', label: 'Home', acciones: ['ver', 'navegar', 'actividad', 'graficas'] },
+    { key: 'home', label: 'Home', acciones: ['ver', 'navegar', 'actividad', 'graficas', 'exportar'] },
     { key: 'atenciones', label: 'Atenciones', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'agendar'] },
     { key: 'citas', label: 'Citas', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'atender'] },
     { key: 'pacientes', label: 'Pacientes', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'seguimiento'] },
@@ -12,8 +12,8 @@ export const PANTALLAS = [
     { key: 'profesion', label: 'Profesiones', acciones: ['ver', 'crear', 'editar', 'eliminar'] },
     { key: 'roles', label: 'Seguridad y Roles', acciones: ['ver', 'crear', 'editar', 'eliminar'] },
     { key: 'reposos', label: 'Reposos', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar'] },
-    { key: 'bitacora', label: 'Seguimiento y Bitacora', acciones: ['ver'] },
-    { key: 'departamentos', label: 'Departamentos', acciones: ['ver', 'crear', 'editar', 'eliminar'] },
+    { key: 'bitacora', label: 'Seguimiento y Bitacora', acciones: ['ver', 'exportar'] },
+    { key: 'departamentos', label: 'Departamentos', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar'] },
     { key: 'finalidades', label: 'Finalidades', acciones: ['ver', 'crear', 'editar', 'eliminar'] },
     { key: 'categoria_e', label: 'Categoria de Patologias', acciones: ['ver', 'crear', 'editar', 'eliminar'] },
     { key: 'categoria_m', label: 'Categoria de Medicamentos', acciones: ['ver', 'crear', 'editar', 'eliminar'] },

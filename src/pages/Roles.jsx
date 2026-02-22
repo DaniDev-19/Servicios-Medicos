@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../utils/instanceSesion";
 import "../index.css";
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
 import Spinner from "../components/spinner";
-import { BaseUrl } from "../utils/Constans";
 import ConfirmModal from "../components/ConfirmModal";
 import InfoModal from "../components/InfoModal";
 import FormModal from "../components/FormModal";
@@ -30,10 +29,6 @@ function Roles() {
     const showToast = useToast();
 
     // Helpers
-    const getAuthHeaders = () => {
-        const token = (localStorage.getItem("token") || "").trim();
-        return token ? { authorization: `Bearer ${token}` } : {};
-    };
 
     const openConfirmDelete = (id) => {
         setSelectedRole(id);
@@ -152,9 +147,7 @@ function Roles() {
     const fetchRoles = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${BaseUrl}roles`, {
-                headers: getAuthHeaders(),
-            });
+            const res = await api.get('roles');
             const data = Array.isArray(res.data) ? res.data : [];
             setRoles(data);
         } catch (error) {
@@ -174,9 +167,7 @@ function Roles() {
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}roles/ver/${row.id}`, {
-                headers: getAuthHeaders(),
-            });
+            const response = await api.get(`roles/ver/${row.id}`);
             setRoleToShow(response.data);
         } catch (error) {
             console.error("Error al mostrar rol:", error?.response?.data || error.message);
@@ -189,9 +180,7 @@ function Roles() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}roles/eliminar/${id}`, {
-                headers: getAuthHeaders(),
-            });
+            await api.delete(`roles/eliminar/${id}`);
             showToast?.("Rol eliminado con éxito", "success", 3000);
             await fetchRoles();
         } catch (error) {

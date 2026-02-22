@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import '../index.css';
 import icon from '../components/icon';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/instanceSesion';
 import { useToast } from '../components/userToasd';
 import Spinner from '../components/spinner';
-import { BaseUrl } from '../utils/Constans';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +41,7 @@ function Login() {
 
         setLoading(true);
         try {
-            const res = await axios.post(`${BaseUrl}auth/login`, {
+            const res = await api.post('auth/login', {
                 username: form.username.trim(),
                 password: form.password
 

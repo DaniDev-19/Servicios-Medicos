@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BaseUrl } from "../utils/Constans";
+import api from "../utils/instanceSesion";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import SingleSelect from "../components/SingleSelect";
@@ -26,12 +25,9 @@ function ForCitas({ onSuccess, onCancel, citaToEdit = null, preSelectedAtencion 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const headers = { Authorization: `Bearer ${token}` };
-
                 const [resPac, resDoc] = await Promise.all([
-                    axios.get(`${BaseUrl}historias_medicas/pacientes-lista`, { headers }),
-                    axios.get(`${BaseUrl}doctores`, { headers })
+                    api.get('historias_medicas/pacientes-lista'),
+                    api.get('doctores')
                 ]);
 
                 if (Array.isArray(resPac.data)) {
@@ -90,14 +86,10 @@ function ForCitas({ onSuccess, onCancel, citaToEdit = null, preSelectedAtencion 
             const dataToSend = { ...formData, usuarios_id };
 
             if (citaToEdit) {
-                await axios.put(`${BaseUrl}citas/actualizar/${citaToEdit.id}`, dataToSend, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await api.put(`citas/actualizar/${citaToEdit.id}`, dataToSend);
                 showToast("Cita actualizada", "success");
             } else {
-                await axios.post(`${BaseUrl}citas/registrar`, dataToSend, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await api.post('citas/registrar', dataToSend);
                 showToast("Cita agendada", "success");
             }
             onSuccess?.();
@@ -148,27 +140,27 @@ function ForCitas({ onSuccess, onCancel, citaToEdit = null, preSelectedAtencion 
                 </div>
 
                 {citaToEdit && (
-                <div className="fc-field">
-                    <label>Estatus</label>
-                    <SingleSelect
-                        options={[
-                            { value: 'programada', label: 'Programada' },
-                            { value: 'confirmada', label: 'Confirmada' },
-                            { value: 'cancelada', label: 'Cancelada' },
-                            { value: 'realizada', label: 'Realizada' },
-                            { value: 'no_asistio', label: 'No Asistió' }
-                        ]}
-                        value={[
-                            { value: 'programada', label: 'Programada' },
-                            { value: 'confirmada', label: 'Confirmada' },
-                            { value: 'cancelada', label: 'Cancelada' },
-                            { value: 'realizada', label: 'Realizada' },
-                            { value: 'no_asistio', label: 'No Asistió' }
-                        ].find(opt => opt.value === formData.estatus)}
-                        onChange={(opt) => setFormData(prev => ({ ...prev, estatus: opt ? opt.value : 'programada' }))}
-                        placeholder="Seleccione estatus"
-                    />
-                </div>
+                    <div className="fc-field">
+                        <label>Estatus</label>
+                        <SingleSelect
+                            options={[
+                                { value: 'programada', label: 'Programada' },
+                                { value: 'confirmada', label: 'Confirmada' },
+                                { value: 'cancelada', label: 'Cancelada' },
+                                { value: 'realizada', label: 'Realizada' },
+                                { value: 'no_asistio', label: 'No Asistió' }
+                            ]}
+                            value={[
+                                { value: 'programada', label: 'Programada' },
+                                { value: 'confirmada', label: 'Confirmada' },
+                                { value: 'cancelada', label: 'Cancelada' },
+                                { value: 'realizada', label: 'Realizada' },
+                                { value: 'no_asistio', label: 'No Asistió' }
+                            ].find(opt => opt.value === formData.estatus)}
+                            onChange={(opt) => setFormData(prev => ({ ...prev, estatus: opt ? opt.value : 'programada' }))}
+                            placeholder="Seleccione estatus"
+                        />
+                    </div>
                 )}
             </div>
             <div className="forc-actions" style={{ marginTop: 20 }}>

@@ -27,6 +27,22 @@
     overflow: auto;
 }
 
+.modal-pdf {
+    background: #fff;
+    border-radius: 8px;
+    width: 95%;
+    max-width: 1300px;
+    height: 95vh;
+    max-height: 950px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation-duration: 0.4s;
+    animation-fill-mode: both;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: auto;
+}
+
 .modal-content5 {
     background: #fff;
     border-radius: 8px;
